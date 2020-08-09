@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+  <com.rengwuxian.materialedittext.MaterialEditText
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:hint="Project Title"
+      app:met_floatingLabel="highlight"
+      app:met_floatingLabelText="Project Title"
+      android:id="@+id/title"
+      android:layout_margin="16dp"
+      />
+  <com.rengwuxian.materialedittext.MaterialEditText
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:hint="Project Price"
+      app:met_floatingLabel="highlight"
+      android:inputType="number"
+      app:met_floatingLabelText="Project Price"
+      android:id="@+id/price"
+      android:layout_marginStart="16dp"
+      android:layout_marginEnd="16dp"
+      android:layout_marginBottom="16dp"
+      />
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:hint="Project Description"
+        app:met_floatingLabel="highlight"
+        app:met_floatingLabelText="Project Description"
+        android:id="@+id/description"
+        android:gravity="top"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        />
+    <fr.ganfra.materialspinner.MaterialSpinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/project_for"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:entries="@array/offered_services"
+        app:ms_hint="Choose Service Type"
+        app:ms_floatingLabelText="Offered Service Type"
+        />
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:id="@+id/img"
+        android:src="@drawable/upload"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity=""
+        android:text="Add Project"
+        android:background="@color/colorPrimary"
+        android:textColor="@android:color/white"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        />
+</LinearLayout>
+</ScrollView>
