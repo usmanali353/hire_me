@@ -7,6 +7,10 @@
         <item>Sweeper</item>
         <item>Plumber</item>
     </string-array>
+    <string-array name="roles">
+        <item>Customer</item>
+        <item>Worker</item>
+    </string-array>
     <string name="title_activity_main">Home</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
