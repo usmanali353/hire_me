@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -124,5 +125,8 @@ public class firebase_operations {
              Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
             }
         });
+    }
+    public static void addProject(Context context, String title, String description, Uri image,double lat,double lng){
+
     }
 }
