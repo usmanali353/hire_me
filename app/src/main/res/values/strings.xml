@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">hire_me</string>
+    <string name="app_name">Hire Me</string>
     <string-array name="offered_services">
         <item>Bike Mechanic</item>
         <item>Car Mechanic</item>

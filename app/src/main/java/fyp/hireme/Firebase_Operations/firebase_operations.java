@@ -3,10 +3,12 @@ package fyp.hireme.Firebase_Operations;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -18,6 +20,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
+
+import fyp.hireme.MainActivity;
 import fyp.hireme.Model.user;
 
 public class firebase_operations {
@@ -39,6 +43,8 @@ public class firebase_operations {
                                 prefs.edit().putString("user_info",new Gson().toJson(u)).apply();
                                 Toast.makeText(context,"Login Sucess",Toast.LENGTH_LONG).show();
                                 loginDialog.dismiss();
+                                context.startActivity(new Intent(context, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                                ((AppCompatActivity)context).finish();
                             }
                         }
                     }).addOnFailureListener(new OnFailureListener() {

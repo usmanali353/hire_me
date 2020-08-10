@@ -2,19 +2,25 @@ package fyp.hireme;
 
 import androidx.fragment.app.FragmentActivity;
 
+import android.location.Location;
 import android.os.Bundle;
 
+import com.example.easywaylocation.EasyWayLocation;
+import com.example.easywaylocation.Listener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, Listener {
 
     private GoogleMap mMap;
-
+    EasyWayLocation easyWayLocation;
+    double lat=0.0,lng=0.0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,6 +29,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        LocationRequest request = new LocationRequest();
+        request.setInterval(20000);
+        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        easyWayLocation = new EasyWayLocation(MapsActivity.this ,request,true,this);
+        easyWayLocation.startLocation();
     }
 
     /**
@@ -38,8 +49,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                mMap.clear();
+                mMap.addMarker(new MarkerOptions().position(latLng).title("Selected Location"));
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+
+            }
+        });
+
+    }
+
+    @Override
+    public void locationOn() {
+
+    }
+
+    @Override
+    public void currentLocation(Location location) {
+        if(location!=null){
+            lat=location.getLatitude();
+            lng=location.getLongitude();
+            LatLng sydney = new LatLng(lat, lng);
+
+            mMap.addMarker(new MarkerOptions().position(sydney).title("Current Location"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        }
+    }
+
+    @Override
+    public void locationCancelled() {
+
     }
 }

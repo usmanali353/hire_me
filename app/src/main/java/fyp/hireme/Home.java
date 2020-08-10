@@ -1,8 +1,12 @@
 package fyp.hireme;
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.wifi.hotspot2.pps.HomeSp;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,8 +15,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.rengwuxian.materialedittext.MaterialEditText;
 
@@ -31,6 +37,13 @@ public class Home extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.home_page);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(Home.this, Manifest.permission.ACCESS_COARSE_LOCATION)== PackageManager.PERMISSION_GRANTED&&ContextCompat.checkSelfPermission(Home.this, Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED){
+
+            }else{
+                requestPermissions(new String[] { Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION }, 1000);
+            }
+        }
         Register=findViewById(R.id.btnRegister);
         Login=findViewById(R.id.btnSignin);
         forgotPassword=findViewById(R.id.txt_forgot_password);
@@ -183,5 +196,39 @@ public class Home extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+
+            case 1000:
+
+                // If request is cancelled, the result arrays are empty.
+
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED&&grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+
+                } else {
+                    Toast.makeText(Home.this,"Location Permission is Required to Use this App",Toast.LENGTH_LONG).show();
+                    finish();
+
+                    // Explain to the user that the feature is unavailable because
+
+                    // the features requires a permission that the user has denied.
+
+                    // At the same time, respect the user's decision. Don't link to
+
+                    // system settings in an effort to convince the user to change
+
+                    // their decision.
+
+                }
+
+        }
+
     }
 }
