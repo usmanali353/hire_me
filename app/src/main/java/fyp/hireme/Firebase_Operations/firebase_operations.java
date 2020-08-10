@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -20,9 +21,17 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
+
 import fyp.hireme.MainActivity;
+import fyp.hireme.Model.project;
 import fyp.hireme.Model.user;
 
 public class firebase_operations {
@@ -127,6 +136,58 @@ public class firebase_operations {
         });
     }
     public static void addProject(Context context, String title, String description, Uri image,double lat,double lng){
+        ProgressDialog pd=new ProgressDialog(context);
+        pd.setMessage("Adding Project...");
+        pd.show();
+      StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+        String report_id = UUID.randomUUID().toString();
+        final StorageReference project_images_folder = storageReference.child("project_images/" + report_id);
+        project_images_folder.putFile(image).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+             project_images_folder.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                 @Override
+                 public void onSuccess(Uri uri) {
+                     pd.dismiss();
+                     Date date = new Date();
+                     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                     String d=formatter.format(date);
+                     project p=new project(title,description,uri.toString(),lat,lng,d,FirebaseAuth.getInstance().getCurrentUser().getUid());
+                     FirebaseFirestore.getInstance().collection("Project").document().set(p).addOnCompleteListener(new OnCompleteListener<Void>() {
+                         @Override
+                         public void onComplete(@NonNull Task<Void> task) {
+                             pd.dismiss();
+                             if(task.isSuccessful()){
+                                 Toast.makeText(context,"Project Added",Toast.LENGTH_LONG).show();
+                                 context.startActivity(new Intent(context,MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                                 ((AppCompatActivity)context).finish();
+                             }
+                         }
+                     }).addOnFailureListener(new OnFailureListener() {
+                         @Override
+                         public void onFailure(@NonNull Exception e) {
+                             pd.dismiss();
+                             Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+                         }
+                     });
+                 }
+             }).addOnFailureListener(new OnFailureListener() {
+                 @Override
+                 public void onFailure(@NonNull Exception e) {
+                     pd.dismiss();
+                     Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+                 }
+             });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                pd.dismiss();
+                Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+    public static void getProjectsforCustomer(Context context, RecyclerView projectsList){
 
     }
 }

@@ -3,6 +3,7 @@ package fyp.hireme;
 import androidx.fragment.app.FragmentActivity;
 
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 
 import com.example.easywaylocation.EasyWayLocation;
@@ -15,12 +16,19 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import fyp.hireme.Firebase_Operations.firebase_operations;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, Listener {
 
     private GoogleMap mMap;
     EasyWayLocation easyWayLocation;
     double lat=0.0,lng=0.0;
+    FirebaseStorage storage;
+    StorageReference storageReference;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +42,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         easyWayLocation = new EasyWayLocation(MapsActivity.this ,request,true,this);
         easyWayLocation.startLocation();
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
     }
 
     /**
@@ -55,7 +65,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.clear();
                 mMap.addMarker(new MarkerOptions().position(latLng).title("Selected Location"));
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-
+                firebase_operations.addProject(MapsActivity.this,getIntent().getStringExtra("title"),getIntent().getStringExtra("description"), Uri.parse(getIntent().getStringExtra("image_uri")),latLng.latitude,latLng.longitude);
             }
         });
 

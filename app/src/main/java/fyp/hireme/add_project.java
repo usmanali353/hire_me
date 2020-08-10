@@ -59,7 +59,7 @@ String resultUri;
                 }else if(bitmap==null){
                     Toast.makeText(add_project.this,"You have not selected any Image",Toast.LENGTH_LONG).show();
                 }else{
-                    startActivity(new Intent(add_project.this,MapsActivity.class));
+                    startActivity(new Intent(add_project.this,MapsActivity.class).putExtra("title",projectTitle.getText().toString()).putExtra("description",projectDescription.getText().toString()).putExtra("image_uri",image_project_uri.toString()));
                 }
             }
         });
