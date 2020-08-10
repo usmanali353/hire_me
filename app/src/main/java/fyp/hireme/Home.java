@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +17,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import fr.ganfra.materialspinner.MaterialSpinner;
+import fyp.hireme.Firebase_Operations.firebase_operations;
+import fyp.hireme.Utils.utils;
 
 import static android.content.DialogInterface.BUTTON_POSITIVE;
 
@@ -57,6 +60,7 @@ public class Home extends AppCompatActivity {
         MaterialEditText phone=registerView.findViewById(R.id.phonetxt);
         MaterialEditText password=registerView.findViewById(R.id.passwordtxt);
         MaterialSpinner offeredService=registerView.findViewById(R.id.choose_offered_services);
+        MaterialSpinner roles=registerView.findViewById(R.id.role);
         AlertDialog registerDialog=new AlertDialog.Builder(Home.this)
                 .setTitle("Register")
                 .setPositiveButton("Register", new DialogInterface.OnClickListener() {
@@ -75,7 +79,29 @@ public class Home extends AppCompatActivity {
          registerDialog.getButton(BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
              @Override
              public void onClick(View v) {
-
+                 if(email.getText().toString().isEmpty()){
+                     email.setError("Provide valid email");
+                 }else if(!utils.isEmailValid(email.getText().toString())){
+                     email.setError("Email Format is not correct");
+                 }else if(password.getText().toString().isEmpty()){
+                     password.setError("Provide Password");
+                 }else if(!utils.isPasswordValid(password.getText().toString())){
+                     password.setError("Invalid Password");
+                 }else if(name.getText().toString().isEmpty()) {
+                     name.setError("Enter your Name");
+                 }else if(phone.getText().toString().isEmpty()){
+                     phone.setError("Enter Your Phone");
+                 }else if(roles.getSelectedItem()==null){
+                     roles.setError("Select Role");
+                 }else if(offeredService.getSelectedItem()==null){
+                     offeredService.setError("Select Offered Service");
+                 }else{
+                    if(utils.isNetworkAvailable(Home.this)) {
+                        firebase_operations.Register(name.getText().toString(),email.getText().toString(),password.getText().toString(),phone.getText().toString(),roles.getSelectedItem().toString(),offeredService.getSelectedItem().toString(),Home.this,registerDialog);
+                    }else{
+                        Toast.makeText(Home.this,"Network not Available",Toast.LENGTH_LONG).show();
+                    }
+                 }
              }
          });
     }
@@ -102,7 +128,22 @@ public class Home extends AppCompatActivity {
         loginDialog.getButton(BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              startActivity(new Intent(Home.this,add_project.class));
+                if(email.getText().toString().isEmpty()){
+                    email.setError("Provide valid email");
+                }else if(!utils.isEmailValid(email.getText().toString())){
+                    email.setError("Email Format is not correct");
+                }else if(password.getText().toString().isEmpty()){
+                    password.setError("Provide Password");
+                }else if(!utils.isPasswordValid(password.getText().toString())){
+                    password.setError("Invalid Password");
+                }else {
+                    if(utils.isNetworkAvailable(Home.this)){
+                        firebase_operations.SignIn(email.getText().toString(),password.getText().toString(),Home.this,loginDialog);
+                    }else{
+                        Toast.makeText(Home.this,"Network not Avaliable",Toast.LENGTH_LONG).show();
+                    }
+
+                }
             }
         });
     }
@@ -128,7 +169,18 @@ public class Home extends AppCompatActivity {
         forgotPasswordDialog.getButton(BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(email.getText().toString().isEmpty()){
+                    email.setError("Provide valid email");
+                }else if(!utils.isEmailValid(email.getText().toString())){
+                    email.setError("Email Format is not correct");
+                }else{
+                    if(utils.isNetworkAvailable(Home.this)){
+                        firebase_operations.ForgotPassword(email.getText().toString(),Home.this,forgotPasswordDialog);
+                    }else{
+                        Toast.makeText(Home.this,"Network not Available",Toast.LENGTH_LONG).show();
+                    }
 
+                }
             }
         });
     }
