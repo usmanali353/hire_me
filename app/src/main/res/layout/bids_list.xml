@@ -4,6 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardElevation="5dp"
+    android:id="@+id/card"
     app:cardUseCompatPadding="true"
     >
     <RelativeLayout
@@ -24,6 +25,9 @@
             android:id="@+id/mechanic_name"
             android:text="Mechanic Name"
             android:layout_toEndOf="@+id/icon"
+            android:textSize="18sp"
+            android:singleLine="true"
+            android:layout_marginEnd="10dp"
             android:layout_marginTop="10dp"
             />
         <TextView
@@ -31,6 +35,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/price"
             android:text="bid price"
+            android:singleLine="true"
+            android:layout_marginEnd="10dp"
             android:layout_toEndOf="@+id/icon"
             android:layout_below="@+id/mechanic_name"
             />
@@ -39,6 +45,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/date"
             android:text="bid Date"
+            android:singleLine="true"
+            android:layout_marginEnd="10dp"
             android:layout_toEndOf="@+id/icon"
             android:layout_below="@+id/price"
             />
@@ -47,6 +55,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/status"
             android:text="bid Status"
+            android:singleLine="true"
+            android:layout_marginEnd="10dp"
             android:layout_toEndOf="@+id/icon"
             android:layout_below="@+id/date"
             />

@@ -31,8 +31,11 @@ import com.google.gson.Gson;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
+import fyp.hireme.Adapters.bids_list_adapter;
 import fyp.hireme.Adapters.projects_list_adapter;
 import fyp.hireme.MainActivity;
 import fyp.hireme.Model.Bid;
@@ -228,13 +231,13 @@ public class firebase_operations {
         });
 
     }
-    public static void getProjectsforBids(Context context, RecyclerView projectsList){
+    public static void getProjectsforBids(Context context, RecyclerView projectsList,String offeredService){
         ProgressDialog pd=new ProgressDialog(context);
         pd.setMessage("getting Projects for Bids...");
         pd.show();
         ArrayList<project> projects=new ArrayList<>();
         ArrayList<String>  projectIds=new ArrayList<>();
-        FirebaseFirestore.getInstance().collection("Project").whereEqualTo("status","New Project").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        FirebaseFirestore.getInstance().collection("Project").whereEqualTo("status","New Project").whereEqualTo("offered_service",offeredService).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 pd.dismiss();
@@ -279,16 +282,18 @@ public class firebase_operations {
          }
      });
     }
-    public static void checkBidsAlreadyExist(Context context,String projectId,String workerId){
+    public static void checkBidsAlreadyExist(Context context,String projectId,String workerId,String mechanic_name,String bidDate,int price,String status,AlertDialog bidDialog){
         ProgressDialog pd=new ProgressDialog(context);
         pd.setMessage("checking if already Bidded...");
         pd.show();
-        FirebaseFirestore.getInstance().collection("Bids").whereEqualTo("projectId",projectId).whereEqualTo("mechanicId",workerId).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        FirebaseFirestore.getInstance().collection("Bid").whereEqualTo("projectId",projectId).whereEqualTo("mechanicId",workerId).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 pd.dismiss();
                 if(queryDocumentSnapshots.getDocuments().size()>0){
                     Toast.makeText(context,"You have already bidded on this project",Toast.LENGTH_LONG).show();
+                }else{
+                    AddBid(context,mechanic_name,bidDate,projectId,price,status,bidDialog);
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -299,13 +304,13 @@ public class firebase_operations {
             }
         });
     }
-    public static void getBidsforProject(Context context,String projectId,RecyclerView bidList){
+    public static void getBidsforProject(Context context,String projectId,RecyclerView bidList,String bidStatus){
         ProgressDialog pd=new ProgressDialog(context);
         pd.setMessage("getting Bids for Project...");
         pd.show();
         ArrayList<Bid> bids=new ArrayList<>();
         ArrayList<String> bidId=new ArrayList<>();
-        FirebaseFirestore.getInstance().collection("Bids").whereEqualTo("projectId",projectId).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        FirebaseFirestore.getInstance().collection("Bid").whereEqualTo("projectId",projectId).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 pd.dismiss();
@@ -314,7 +319,76 @@ public class firebase_operations {
                       bids.add(queryDocumentSnapshots.getDocuments().get(i).toObject(Bid.class));
                       bidId.add(queryDocumentSnapshots.getDocuments().get(i).getId());
                   }
+                   bidList.setAdapter(new bids_list_adapter(context,bids,bidId,projectId,bidStatus));
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                pd.dismiss();
+                Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+    public static void acceptBid(Context context,String bidId,String projectId,String workerId){
+        ProgressDialog pd=new ProgressDialog(context);
+        pd.setMessage("Please Wait...");
+        pd.show();
+        Map<String,Object> projectUpdateData=new HashMap<>();
+        projectUpdateData.put("status","Allotted");
+        projectUpdateData.put("allottedTo",workerId);
+        Map<String,Object> bidUpdateData=new HashMap<>();
+        bidUpdateData.put("status","Accepted");
+        FirebaseFirestore.getInstance().collection("Project").document(projectId).update(projectUpdateData).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                pd.dismiss();
+                if(task.isSuccessful()){
+                    FirebaseFirestore.getInstance().collection("Bid").document(bidId).update(bidUpdateData).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if(task.isSuccessful()){
+                                Toast.makeText(context,"Bid Accepted",Toast.LENGTH_LONG).show();
+                                context.startActivity(new Intent(context,MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                                ((AppCompatActivity)context).finish();
+                            }
 
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            pd.dismiss();
+                            Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                pd.dismiss();
+                Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+    public static void getOngoingProjectsForWorker(Context context,String WorkerId,RecyclerView projectsList){
+        ProgressDialog pd=new ProgressDialog(context);
+        pd.setMessage("Please Wait...");
+        pd.show();
+        ArrayList<project> projects=new ArrayList<>();
+        ArrayList<String>  projectIds=new ArrayList<>();
+        FirebaseFirestore.getInstance().collection("Project").whereEqualTo("allottedTo",WorkerId).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                pd.dismiss();
+                if(queryDocumentSnapshots.getDocuments().size()>0){
+                    for(int i=0;i<queryDocumentSnapshots.getDocuments().size();i++){
+                        projects.add(queryDocumentSnapshots.getDocuments().get(i).toObject(project.class));
+                        projectIds.add(queryDocumentSnapshots.getDocuments().get(i).getId());
+                    }
+                    projectsList.setAdapter(new projects_list_adapter(projects,context,projectIds));
+                }else{
+                    Toast.makeText(context,"No Projects Found",Toast.LENGTH_LONG).show();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {

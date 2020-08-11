@@ -3,6 +3,7 @@ package fyp.hireme.Adapters;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,10 +12,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.squareup.picasso.Picasso;
@@ -26,6 +29,7 @@ import fyp.hireme.Model.project;
 import fyp.hireme.Model.user;
 import fyp.hireme.R;
 import fyp.hireme.Utils.utils;
+import fyp.hireme.bidsList;
 
 public class projects_list_adapter extends RecyclerView.Adapter<projects_list_adapter.project_list_viewholder> {
     ArrayList<project> projects;
@@ -81,12 +85,13 @@ public class projects_list_adapter extends RecyclerView.Adapter<projects_list_ad
                         }else if(Integer.parseInt(price.getText().toString())==0&&Integer.parseInt(price.getText().toString())<1000){
                             price.setError("Bid Price too Low");
                         }else{
-
-                            firebase_operations.AddBid(context,u.getName(), utils.getCurrentDate(),projectIds.get(position),Integer.parseInt(price.getText().toString()),"New Bid",place_bid_dialog);
+                            firebase_operations.checkBidsAlreadyExist(context,projectIds.get(position),FirebaseAuth.getInstance().getCurrentUser().getUid(),u.getName(),utils.getCurrentDate(),Integer.parseInt(price.getText().toString()),"New Bid",place_bid_dialog);
                         }
                     }
                 });
 
+            }else if(u.getRole().equals("Customer")){
+                context.startActivity(new Intent(context, bidsList.class).putExtra("project_id",projectIds.get(position)).putExtra("project_status",projects.get(position).getStatus()));
             }
           }
       });
