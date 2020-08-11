@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     card_view:cardUseCompatPadding="true"
+    android:id="@+id/card"
     card_view:cardElevation="5dp">
     <RelativeLayout
         android:layout_width="match_parent"

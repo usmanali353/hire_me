@@ -4,6 +4,9 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class utils {
     public static boolean isNetworkAvailable(Context context) {
 
@@ -23,5 +26,10 @@ public class utils {
     }
     public static boolean isPasswordValid(String password){
         return password.matches("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\\w\\s]).{6,}$");
+    }
+    public static String getCurrentDate(){
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        return formatter.format(date);
     }
 }

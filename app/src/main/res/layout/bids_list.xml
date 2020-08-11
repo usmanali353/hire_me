@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:id="@+id/icon"
+        android:layout_margin="10dp"
+        android:src="@drawable/auction"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/mechanic_name"
+        android:text="Mechanic Name"
+        android:layout_toEndOf="@+id/icon"
+        android:layout_marginTop="10dp"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/price"
+        android:text="bid price"
+        android:layout_toEndOf="@+id/icon"
+        android:layout_below="@+id/mechanic_name"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/date"
+        android:text="bid Date"
+        android:layout_toEndOf="@+id/icon"
+        android:layout_below="@+id/price"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/status"
+        android:text="bid Status"
+        android:layout_toEndOf="@+id/icon"
+        android:layout_below="@+id/date"
+        />
+
+</RelativeLayout>
