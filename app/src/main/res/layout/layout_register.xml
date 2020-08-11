@@ -85,6 +85,7 @@
                 android:id="@+id/choose_offered_services"
                 android:entries="@array/offered_services"
                 app:ms_hint="Choose Offered Service"
+                android:visibility="gone"
                 app:ms_floatingLabelText="Offered Service"
                 />
         </LinearLayout>

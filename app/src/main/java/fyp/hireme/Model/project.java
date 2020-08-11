@@ -5,6 +5,15 @@ public class project {
     String description;
     String image;
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    String status;
     public String getCustomerId() {
         return customerId;
     }
@@ -25,7 +34,7 @@ public class project {
     String date;
     double lat,lng;
 
-    public project(String title, String description, String image, double lat, double lng,String date,String customerId) {
+    public project(String title, String description, String image, double lat, double lng,String date,String customerId,String status) {
         this.title = title;
         this.description = description;
         this.image = image;
@@ -33,6 +42,7 @@ public class project {
         this.lng = lng;
         this.date=date;
         this.customerId=customerId;
+        this.status=status;
     }
     public project(){
 

@@ -1,16 +1,14 @@
 package fyp.hireme;
 import android.Manifest;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.wifi.hotspot2.pps.HomeSp;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -74,6 +72,21 @@ public class Home extends AppCompatActivity {
         MaterialEditText password=registerView.findViewById(R.id.passwordtxt);
         MaterialSpinner offeredService=registerView.findViewById(R.id.choose_offered_services);
         MaterialSpinner roles=registerView.findViewById(R.id.role);
+        roles.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(position==1){
+                    offeredService.setVisibility(View.VISIBLE);
+                }else{
+                    offeredService.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
         AlertDialog registerDialog=new AlertDialog.Builder(Home.this)
                 .setTitle("Register")
                 .setPositiveButton("Register", new DialogInterface.OnClickListener() {
@@ -106,11 +119,16 @@ public class Home extends AppCompatActivity {
                      phone.setError("Enter Your Phone");
                  }else if(roles.getSelectedItem()==null){
                      roles.setError("Select Role");
-                 }else if(offeredService.getSelectedItem()==null){
+                 }else if(offeredService.getVisibility()==View.VISIBLE&&offeredService.getSelectedItem()==null){
                      offeredService.setError("Select Offered Service");
                  }else{
                     if(utils.isNetworkAvailable(Home.this)) {
-                        firebase_operations.Register(name.getText().toString(),email.getText().toString(),password.getText().toString(),phone.getText().toString(),roles.getSelectedItem().toString(),offeredService.getSelectedItem().toString(),Home.this,registerDialog);
+                        if(offeredService.getVisibility()==View.GONE){
+                            firebase_operations.Register(name.getText().toString(),email.getText().toString(),password.getText().toString(),phone.getText().toString(),roles.getSelectedItem().toString(),null,Home.this,registerDialog);
+                        }else{
+                            firebase_operations.Register(name.getText().toString(),email.getText().toString(),password.getText().toString(),phone.getText().toString(),roles.getSelectedItem().toString(),offeredService.getSelectedItem().toString(),Home.this,registerDialog);
+                        }
+
                     }else{
                         Toast.makeText(Home.this,"Network not Available",Toast.LENGTH_LONG).show();
                     }

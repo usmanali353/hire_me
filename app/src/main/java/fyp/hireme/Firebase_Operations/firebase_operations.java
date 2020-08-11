@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,15 +22,18 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
+import fyp.hireme.Adapters.projects_list_adapter;
 import fyp.hireme.MainActivity;
 import fyp.hireme.Model.project;
 import fyp.hireme.Model.user;
@@ -44,7 +48,7 @@ public class firebase_operations {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
-                    FirebaseFirestore.getInstance().collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                         @Override
                         public void onSuccess(DocumentSnapshot documentSnapshot) {
                             pd.dismiss();
@@ -55,7 +59,7 @@ public class firebase_operations {
                                 loginDialog.dismiss();
                                 context.startActivity(new Intent(context, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK));
                                 ((AppCompatActivity)context).finish();
-                            }
+                            }else{}
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -107,7 +111,7 @@ public class firebase_operations {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
                     user u=new user(name,email,phone,password,role,offered_service);
-                    FirebaseFirestore.getInstance().collection("user").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).set(u).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).set(u).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             pd.dismiss();
@@ -152,7 +156,7 @@ public class firebase_operations {
                      Date date = new Date();
                      SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
                      String d=formatter.format(date);
-                     project p=new project(title,description,uri.toString(),lat,lng,d,FirebaseAuth.getInstance().getCurrentUser().getUid());
+                     project p=new project(title,description,uri.toString(),lat,lng,d,FirebaseAuth.getInstance().getCurrentUser().getUid(),"New Project");
                      FirebaseFirestore.getInstance().collection("Project").document().set(p).addOnCompleteListener(new OnCompleteListener<Void>() {
                          @Override
                          public void onComplete(@NonNull Task<Void> task) {
@@ -160,7 +164,7 @@ public class firebase_operations {
                              if(task.isSuccessful()){
                                  Toast.makeText(context,"Project Added",Toast.LENGTH_LONG).show();
                                  context.startActivity(new Intent(context,MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP));
-                                 ((AppCompatActivity)context).finish();
+                                 ((FragmentActivity)context).finish();
                              }
                          }
                      }).addOnFailureListener(new OnFailureListener() {
@@ -188,6 +192,32 @@ public class firebase_operations {
         });
     }
     public static void getProjectsforCustomer(Context context, RecyclerView projectsList){
+        ProgressDialog pd=new ProgressDialog(context);
+        pd.setMessage("getting Projects...");
+        pd.show();
+        ArrayList<project> projects=new ArrayList<>();
+        ArrayList<String>  projectIds=new ArrayList<>();
+        FirebaseFirestore.getInstance().collection("Project").whereEqualTo("customerId",FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                pd.dismiss();
+                if(queryDocumentSnapshots.getDocuments().size()>0){
+                    for(int i=0;i<queryDocumentSnapshots.getDocuments().size();i++){
+                        projects.add(queryDocumentSnapshots.getDocuments().get(i).toObject(project.class));
+                        projectIds.add(queryDocumentSnapshots.getDocuments().get(i).getId());
+                    }
+                    projectsList.setAdapter(new projects_list_adapter(projects,context,projectIds));
+                }else{
+                    Toast.makeText(context,"No Projects Found",Toast.LENGTH_LONG).show();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                pd.dismiss();
+                Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
 
     }
 }
