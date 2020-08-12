@@ -10,9 +10,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatRatingBar;
 import androidx.cardview.widget.CardView;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -93,6 +95,37 @@ public class projects_list_adapter extends RecyclerView.Adapter<projects_list_ad
 
             }else if(u.getRole().equals("Customer")){
                 context.startActivity(new Intent(context, bidsList.class).putExtra("project_id",projectIds.get(position)).putExtra("project_status",projects.get(position).getStatus()));
+            }else if(u.getRole().equals("Customer")&&projects.get(position).getStatus().equals("Allotted")){
+                View completeProjectView=LayoutInflater.from(context).inflate(R.layout.rate_work_layout,null);
+                AppCompatRatingBar rating=completeProjectView.findViewById(R.id.rating);
+                MaterialEditText comments=completeProjectView.findViewById(R.id.comments);
+               AlertDialog completeProjectDialog= new AlertDialog.Builder(context)
+                        .setTitle("Mark Project as Completed")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            }
+                        }).setView(completeProjectView).create();
+                        completeProjectDialog.show();
+                        completeProjectDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if(rating.getRating()==0){
+                                    Toast.makeText(context,"Please Rate",Toast.LENGTH_LONG).show();
+                                }else if(comments.getText().toString().isEmpty()){
+                                    comments.setError("Please Comment on the work");
+                                }else{
+                                    firebase_operations.rateComment(context,projectIds.get(position),String.valueOf(rating.getRating()),comments.getText().toString());
+                                }
+                            }
+                        });
+
             }
           }
       });

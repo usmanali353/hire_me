@@ -460,5 +460,27 @@ public class firebase_operations {
             }
         });
     }
-
+    public static void rateComment(Context context,String projectId,String rating,String comment){
+        ProgressDialog pd=new ProgressDialog(context);
+        pd.setMessage("Deleting User");
+        pd.show();
+        Map<String,Object> projectUpdate=new HashMap<>();
+        projectUpdate.put("status","Completed");
+        projectUpdate.put("rating",rating);
+        projectUpdate.put("comments",comment);
+        FirebaseFirestore.getInstance().collection("Project").document(projectId).update(projectUpdate).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()){
+                    Toast.makeText(context,"Rating and comments added",Toast.LENGTH_LONG).show();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+             pd.dismiss();
+             Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
+    }
 }
