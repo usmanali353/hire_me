@@ -37,11 +37,13 @@ import java.util.UUID;
 
 import fyp.hireme.Adapters.bids_list_adapter;
 import fyp.hireme.Adapters.projects_list_adapter;
+import fyp.hireme.Adapters.user_list_adapter;
 import fyp.hireme.MainActivity;
 import fyp.hireme.Model.Bid;
 import fyp.hireme.Model.project;
 import fyp.hireme.Model.user;
 import fyp.hireme.Utils.utils;
+import fyp.hireme.usersList;
 import fyp.hireme.worker_home;
 
 public class firebase_operations {
@@ -54,34 +56,43 @@ public class firebase_operations {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
-                    FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(DocumentSnapshot documentSnapshot) {
-                            pd.dismiss();
-                            if(documentSnapshot.exists()){
-                                user u=documentSnapshot.toObject(user.class);
-                                prefs.edit().putString("user_info",new Gson().toJson(u)).apply();
-                                Toast.makeText(context,"Login Sucess",Toast.LENGTH_LONG).show();
-                                loginDialog.dismiss();
-                                if(u.getRole().equals("Customer")){
-                                    context.startActivity(new Intent(context, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK));
-                                    ((AppCompatActivity)context).finish();
-                                }else if(u.getRole().equals("Worker")){
-                                    context.startActivity(new Intent(context, worker_home.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK));
-                                    ((AppCompatActivity)context).finish();
+                    if(FirebaseAuth.getInstance().getCurrentUser().getUid().equals("csAMKO8zUraljjOc7uJpjGRUCfP2")){
+                        prefs.edit().putString("user_role","Admin").apply();
+                        Toast.makeText(context,"Login Sucess",Toast.LENGTH_LONG).show();
+                        loginDialog.dismiss();
+                        context.startActivity(new Intent(context, usersList.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                        ((AppCompatActivity)context).finish();
+                    }else{
+                        FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                pd.dismiss();
+                                if(documentSnapshot.exists()){
+                                    user u=documentSnapshot.toObject(user.class);
+                                    prefs.edit().putString("user_info",new Gson().toJson(u)).apply();
+                                    Toast.makeText(context,"Login Sucess",Toast.LENGTH_LONG).show();
+                                    loginDialog.dismiss();
+                                    if(u.getRole().equals("Customer")){
+                                        context.startActivity(new Intent(context, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                                        ((AppCompatActivity)context).finish();
+                                    }else if(u.getRole().equals("Worker")){
+                                        context.startActivity(new Intent(context, worker_home.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                                        ((AppCompatActivity)context).finish();
+                                    }
+                                }else{
+                                    Toast.makeText(context,"No User Data Exist",Toast.LENGTH_LONG).show();
                                 }
-                            }else{
-                                Toast.makeText(context,"No User Data Exist",Toast.LENGTH_LONG).show();
                             }
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            pd.dismiss();
-                            loginDialog.dismiss();
-                         Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
-                        }
-                    });
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                pd.dismiss();
+                                loginDialog.dismiss();
+                                Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -152,7 +163,7 @@ public class firebase_operations {
             }
         });
     }
-    public static void addProject(Context context, String title, String description, Uri image,double lat,double lng){
+    public static void addProject(Context context, String title, String description, Uri image,double lat,double lng,String serviceFrom){
         ProgressDialog pd=new ProgressDialog(context);
         pd.setMessage("Adding Project...");
         pd.show();
@@ -167,7 +178,7 @@ public class firebase_operations {
                  public void onSuccess(Uri uri) {
                      pd.dismiss();
 
-                     project p=new project(title,description,uri.toString(),lat,lng,utils.getCurrentDate(),FirebaseAuth.getInstance().getCurrentUser().getUid(),"New Project");
+                     project p=new project(title,description,uri.toString(),lat,lng,utils.getCurrentDate(),FirebaseAuth.getInstance().getCurrentUser().getUid(),"New Project",serviceFrom);
                      FirebaseFirestore.getInstance().collection("Project").document().set(p).addOnCompleteListener(new OnCompleteListener<Void>() {
                          @Override
                          public void onComplete(@NonNull Task<Void> task) {
@@ -237,7 +248,7 @@ public class firebase_operations {
         pd.show();
         ArrayList<project> projects=new ArrayList<>();
         ArrayList<String>  projectIds=new ArrayList<>();
-        FirebaseFirestore.getInstance().collection("Project").whereEqualTo("status","New Project").whereEqualTo("offered_service",offeredService).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        FirebaseFirestore.getInstance().collection("Project").whereEqualTo("status","New Project").whereEqualTo("requiredService",offeredService).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 pd.dismiss();
@@ -399,4 +410,55 @@ public class firebase_operations {
             }
         });
     }
+    public static void getAllUsers(Context context,RecyclerView usersList){
+        ProgressDialog pd=new ProgressDialog(context);
+        pd.setMessage("Fetching User List");
+        pd.show();
+        ArrayList<user> users=new ArrayList<>();
+        ArrayList<String> userId=new ArrayList<>();
+        FirebaseFirestore.getInstance().collection("Users").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                pd.dismiss();
+                if(queryDocumentSnapshots.getDocuments().size()>0){
+                    for(int i=0;i<queryDocumentSnapshots.getDocuments().size();i++){
+                        users.add(queryDocumentSnapshots.getDocuments().get(i).toObject(user.class));
+                        userId.add(queryDocumentSnapshots.getDocuments().get(i).getId());
+                    }
+                    usersList.setAdapter(new user_list_adapter(users,userId,context));
+                }else{
+                    Toast.makeText(context,"No Users Found",Toast.LENGTH_LONG).show();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+             pd.dismiss();
+             Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+    public static void deleteUsers(Context context,String userId){
+        ProgressDialog pd=new ProgressDialog(context);
+        pd.setMessage("Deleting User");
+        pd.show();
+        FirebaseFirestore.getInstance().collection("Users").document(userId).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                pd.dismiss();
+                if(task.isSuccessful()){
+                    Toast.makeText(context,"User Deleted Sucessfully",Toast.LENGTH_LONG).show();
+                    context.startActivity(new Intent(context,usersList.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                    ((AppCompatActivity)context).finish();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+             pd.dismiss();
+             Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
 }

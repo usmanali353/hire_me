@@ -63,7 +63,7 @@ public class worker_home extends AppCompatActivity {
         vpa.addfragment(new ongoingProjects(),"On going");
         vpa.addfragment(new projects_for_bids(),"for Bids");
         vp.setAdapter(vpa);
-        vp.setOffscreenPageLimit(2);
+       // vp.setOffscreenPageLimit(2);
     }
 
     class viewpageradapter extends FragmentStatePagerAdapter {

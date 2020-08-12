@@ -56,10 +56,12 @@ String resultUri;
                     projectTitle.setError("Enter Some Project Title");
                 }else if(projectDescription.getText().toString().isEmpty()){
                     projectDescription.setError("Enter some project Description");
+                }else if(serviceFor.getSelectedItem()==null){
+                    serviceFor.setError("Select something from Dropdown");
                 }else if(bitmap==null){
                     Toast.makeText(add_project.this,"You have not selected any Image",Toast.LENGTH_LONG).show();
                 }else{
-                    startActivity(new Intent(add_project.this,MapsActivity.class).putExtra("title",projectTitle.getText().toString()).putExtra("description",projectDescription.getText().toString()).putExtra("image_uri",image_project_uri.toString()));
+                    startActivity(new Intent(add_project.this,MapsActivity.class).putExtra("title",projectTitle.getText().toString()).putExtra("description",projectDescription.getText().toString()).putExtra("image_uri",image_project_uri.toString()).putExtra("service_for",serviceFor.getSelectedItem().toString()));
                 }
             }
         });

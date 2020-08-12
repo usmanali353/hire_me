@@ -55,6 +55,7 @@ public class projects_list_adapter extends RecyclerView.Adapter<projects_list_ad
     public void onBindViewHolder(@NonNull project_list_viewholder holder, int position) {
       holder.title.setText(projects.get(position).getTitle());
       holder.description.setText(projects.get(position).getDescription());
+      holder.status.setText("Status "+projects.get(position).getStatus());
       Picasso.get().load(projects.get(position).getImage()).into(holder.projectImage);
       holder.card.setOnClickListener(new View.OnClickListener() {
           @Override
@@ -103,11 +104,12 @@ public class projects_list_adapter extends RecyclerView.Adapter<projects_list_ad
     }
 
     class project_list_viewholder extends RecyclerView.ViewHolder{
-  TextView title,description;
+  TextView title,description,status;
   ImageView projectImage;
   CardView card;
      public project_list_viewholder(@NonNull View itemView) {
          super(itemView);
+         status=itemView.findViewById(R.id.status);
          title=itemView.findViewById(R.id.title);
          description=itemView.findViewById(R.id.description);
          projectImage=itemView.findViewById(R.id.icon);

@@ -65,7 +65,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.clear();
                 mMap.addMarker(new MarkerOptions().position(latLng).title("Selected Location"));
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                firebase_operations.addProject(MapsActivity.this,getIntent().getStringExtra("title"),getIntent().getStringExtra("description"), Uri.parse(getIntent().getStringExtra("image_uri")),latLng.latitude,latLng.longitude);
+                firebase_operations.addProject(MapsActivity.this,getIntent().getStringExtra("title"),getIntent().getStringExtra("description"), Uri.parse(getIntent().getStringExtra("image_uri")),latLng.latitude,latLng.longitude,getIntent().getStringExtra("service_for"));
             }
         });
 
@@ -73,7 +73,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void locationOn() {
-
+        easyWayLocation.startLocation();
     }
 
     @Override
@@ -82,7 +82,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             lat=location.getLatitude();
             lng=location.getLongitude();
             LatLng sydney = new LatLng(lat, lng);
-
             mMap.addMarker(new MarkerOptions().position(sydney).title("Current Location"));
             mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         }

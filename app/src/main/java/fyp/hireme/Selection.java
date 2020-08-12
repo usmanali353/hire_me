@@ -54,6 +54,9 @@ public class Selection extends AppCompatActivity {
                     finish();
                 }
             }
+        }else if(prefs.getString("user_role",null)!=null){
+            startActivity(new Intent(Selection.this,usersList.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            finish();
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(Selection.this, Manifest.permission.ACCESS_COARSE_LOCATION)== PackageManager.PERMISSION_GRANTED&&ContextCompat.checkSelfPermission(Selection.this, Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED){

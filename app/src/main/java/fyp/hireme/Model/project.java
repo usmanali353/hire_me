@@ -4,7 +4,34 @@ public class project {
     String title;
     String description;
     String image;
+    String comments;
+    String rating;
 
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+
+    public String getRating() {
+        return rating;
+    }
+
+    public void setRating(String rating) {
+        this.rating = rating;
+    }
+
+    public String getRequiredService() {
+        return requiredService;
+    }
+
+    public void setRequiredService(String requiredService) {
+        this.requiredService = requiredService;
+    }
+
+    String requiredService;
     public String getStatus() {
         return status;
     }
@@ -34,7 +61,7 @@ public class project {
     String date;
     double lat,lng;
 
-    public project(String title, String description, String image, double lat, double lng,String date,String customerId,String status) {
+    public project(String title, String description, String image, double lat, double lng,String date,String customerId,String status,String requiredService) {
         this.title = title;
         this.description = description;
         this.image = image;
@@ -43,6 +70,7 @@ public class project {
         this.date=date;
         this.customerId=customerId;
         this.status=status;
+        this.requiredService=requiredService;
     }
     public project(){
 
