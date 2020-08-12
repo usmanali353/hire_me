@@ -483,4 +483,32 @@ public class firebase_operations {
             }
         });
     }
+    public static void getCompletedProjectsForWorker(Context context,String WorkerId,RecyclerView projectsList){
+        ProgressDialog pd=new ProgressDialog(context);
+        pd.setMessage("Please Wait...");
+        pd.show();
+        ArrayList<project> projects=new ArrayList<>();
+        ArrayList<String>  projectIds=new ArrayList<>();
+        FirebaseFirestore.getInstance().collection("Project").whereEqualTo("allottedTo",WorkerId).whereEqualTo("status","Completed").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                pd.dismiss();
+                if(queryDocumentSnapshots.getDocuments().size()>0){
+                    for(int i=0;i<queryDocumentSnapshots.getDocuments().size();i++){
+                        projects.add(queryDocumentSnapshots.getDocuments().get(i).toObject(project.class));
+                        projectIds.add(queryDocumentSnapshots.getDocuments().get(i).getId());
+                    }
+                    projectsList.setAdapter(new projects_list_adapter(projects,context,projectIds));
+                }else{
+                    Toast.makeText(context,"No Projects Found",Toast.LENGTH_LONG).show();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                pd.dismiss();
+                Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
+    }
 }

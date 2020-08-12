@@ -36,6 +36,7 @@ import java.util.ArrayList;
 
 import fr.ganfra.materialspinner.MaterialSpinner;
 import fyp.hireme.Firebase_Operations.firebase_operations;
+import fyp.hireme.Fragments.completedProjectsFragment;
 import fyp.hireme.Fragments.ongoingProjects;
 import fyp.hireme.Fragments.projects_for_bids;
 import fyp.hireme.Utils.utils;
@@ -62,6 +63,7 @@ public class worker_home extends AppCompatActivity {
         viewpageradapter vpa=new viewpageradapter(getSupportFragmentManager());
         vpa.addfragment(new ongoingProjects(),"On going");
         vpa.addfragment(new projects_for_bids(),"for Bids");
+        vpa.addfragment(new completedProjectsFragment(),"Completed");
         vp.setAdapter(vpa);
        // vp.setOffscreenPageLimit(2);
     }

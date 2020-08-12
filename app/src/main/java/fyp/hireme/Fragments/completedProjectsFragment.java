@@ -23,7 +23,7 @@ public class completedProjectsFragment extends Fragment {
         View v= inflater.inflate(R.layout.list,container,false);
         RecyclerView bids_list =v.findViewById(R.id.projects_for_bids_list);
         bids_list.setLayoutManager(new LinearLayoutManager(getActivity()));
-        firebase_operations.getOngoingProjectsForWorker(getActivity(), FirebaseAuth.getInstance().getCurrentUser().getUid(),bids_list);
+        firebase_operations.getCompletedProjectsForWorker(getActivity(), FirebaseAuth.getInstance().getCurrentUser().getUid(),bids_list);
         return v;
     }
 

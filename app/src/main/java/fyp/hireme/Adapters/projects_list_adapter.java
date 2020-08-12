@@ -100,7 +100,7 @@ public class projects_list_adapter extends RecyclerView.Adapter<projects_list_ad
                 AppCompatRatingBar rating=completeProjectView.findViewById(R.id.rating);
                 MaterialEditText comments=completeProjectView.findViewById(R.id.comments);
                AlertDialog completeProjectDialog= new AlertDialog.Builder(context)
-                        .setTitle("Mark Project as Completed")
+                        .setTitle("Rate the Work")
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
