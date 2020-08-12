@@ -54,7 +54,7 @@ public class Selection extends AppCompatActivity {
                     finish();
                 }
             }
-        }else if(prefs.getString("user_role",null)!=null){
+        }  else if(prefs.getString("user_role",null)!=null){
             startActivity(new Intent(Selection.this,usersList.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP));
             finish();
         }
