@@ -1,5 +1,7 @@
 package fyp.hireme;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -7,6 +9,7 @@ import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+import com.rengwuxian.materialedittext.MaterialEditText;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,10 +18,12 @@ import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import fr.ganfra.materialspinner.MaterialSpinner;
 import fyp.hireme.Firebase_Operations.firebase_operations;
 
 public class MainActivity extends AppCompatActivity {
@@ -51,6 +56,39 @@ public class MainActivity extends AppCompatActivity {
             prefs.edit().remove("user_info").apply();
             startActivity(new Intent(MainActivity.this,Selection.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP));
             finish();
+        }else if(item.getItemId()==R.id.change_profile){
+            View v= LayoutInflater.from(MainActivity.this).inflate(R.layout.update_profile,null);
+            MaterialEditText name=v.findViewById(R.id.nametxt);
+            MaterialEditText phone=v.findViewById(R.id.phonetxt);
+            MaterialSpinner offered_service=v.findViewById(R.id.offered_service);
+            offered_service.setVisibility(View.GONE);
+            AlertDialog changeProfileDialog =new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("Change Profile")
+                    .setMessage("Provide Valid Info")
+                     .setPositiveButton("Edit", new DialogInterface.OnClickListener() {
+                         @Override
+                         public void onClick(DialogInterface dialog, int which) {
+
+                         }
+                     }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }).create();
+            changeProfileDialog.show();
+            changeProfileDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(name.getText().toString().isEmpty()) {
+                        name.setError("Enter your Name");
+                    }else if(phone.getText().toString().isEmpty()){
+                        phone.setError("Enter Your Phone");
+                    }else{
+                        firebase_operations.updateProfile(MainActivity.this,FirebaseAuth.getInstance().getCurrentUser().getUid(),name.getText().toString(),phone.getText().toString(),null);
+                    }
+                }
+            });
         }
         return super.onOptionsItemSelected(item);
     }

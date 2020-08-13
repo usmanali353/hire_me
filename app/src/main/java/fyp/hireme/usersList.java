@@ -37,7 +37,7 @@ SharedPreferences prefs;
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.worker_menu,menu);
+        getMenuInflater().inflate(R.menu.admin_menu,menu);
         return true;
     }
 

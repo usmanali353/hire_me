@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<com.rengwuxian.materialedittext.MaterialEditText
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/nametxt"
+    android:layout_marginStart="20dp"
+    android:layout_marginEnd="20dp"
+    android:hint="Name"
+    app:met_floatingLabelText="Name"
+    />
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/phonetxt"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:hint="Phone"
+        android:inputType="phone"
+        app:met_floatingLabelText="Phone"
+        />
+    <fr.ganfra.materialspinner.MaterialSpinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/offered_service"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:ms_hint="Offered Services"
+        app:ms_floatingLabelText="Offered Services"
+        android:entries="@array/offered_services"
+        />
+</LinearLayout>

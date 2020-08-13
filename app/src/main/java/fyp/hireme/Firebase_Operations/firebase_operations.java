@@ -388,7 +388,7 @@ public class firebase_operations {
         pd.show();
         ArrayList<project> projects=new ArrayList<>();
         ArrayList<String>  projectIds=new ArrayList<>();
-        FirebaseFirestore.getInstance().collection("Project").whereEqualTo("allottedTo",WorkerId).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        FirebaseFirestore.getInstance().collection("Project").whereEqualTo("allottedTo",WorkerId).whereEqualTo("status","Allotted").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 pd.dismiss();
@@ -462,7 +462,7 @@ public class firebase_operations {
     }
     public static void rateComment(Context context,String projectId,String rating,String comment){
         ProgressDialog pd=new ProgressDialog(context);
-        pd.setMessage("Deleting User");
+        pd.setMessage("Rating the Project....");
         pd.show();
         Map<String,Object> projectUpdate=new HashMap<>();
         projectUpdate.put("status","Completed");
@@ -471,8 +471,11 @@ public class firebase_operations {
         FirebaseFirestore.getInstance().collection("Project").document(projectId).update(projectUpdate).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
+                pd.dismiss();
                 if(task.isSuccessful()){
                     Toast.makeText(context,"Rating and comments added",Toast.LENGTH_LONG).show();
+                    context.startActivity(new Intent(context,MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                    ((AppCompatActivity)context).finish();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -508,6 +511,39 @@ public class firebase_operations {
             public void onFailure(@NonNull Exception e) {
                 pd.dismiss();
                 Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+    public static void updateProfile(Context context,String userId,String name,String phone,String offeredService){
+        ProgressDialog pd=new ProgressDialog(context);
+        pd.setMessage("Please Wait...");
+        pd.show();
+        SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(context);
+        Map<String,Object> profileUpdateData=new HashMap<>();
+        profileUpdateData.put("name",name);
+        profileUpdateData.put("phone",phone);
+        profileUpdateData.put("offered_service",offeredService);
+        user u=new Gson().fromJson(prefs.getString("user_info",null),user.class);
+        FirebaseFirestore.getInstance().collection("Users").document(userId).update(profileUpdateData).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                pd.dismiss();
+                if(task.isSuccessful()){
+                    Toast.makeText(context,"Profile Updated",Toast.LENGTH_LONG).show();
+                    if(u.getRole().equals("Customer")) {
+                        context.startActivity(new Intent(context, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                        ((AppCompatActivity) context).finish();
+                    }else if(u.getRole().equals("Worker")){
+                        context.startActivity(new Intent(context, worker_home.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                        ((AppCompatActivity) context).finish();
+                    }
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                pd.dismiss();
+             Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
             }
         });
     }

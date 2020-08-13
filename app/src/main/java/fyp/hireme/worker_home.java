@@ -107,6 +107,40 @@ public class worker_home extends AppCompatActivity {
             prefs.edit().remove("user_info").apply();
             startActivity(new Intent(worker_home.this,Selection.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP));
             finish();
+        }else if(item.getItemId()==R.id.change_profile){
+            View v= LayoutInflater.from(worker_home.this).inflate(R.layout.update_profile,null);
+            MaterialEditText name=v.findViewById(R.id.nametxt);
+            MaterialEditText phone=v.findViewById(R.id.phonetxt);
+            MaterialSpinner offered_service=v.findViewById(R.id.offered_service);
+            AlertDialog changeProfileDialog =new AlertDialog.Builder(worker_home.this)
+                    .setTitle("Change Profile")
+                    .setMessage("Provide Valid Info")
+                    .setPositiveButton("Edit", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }).create();
+            changeProfileDialog.show();
+            changeProfileDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(name.getText().toString().isEmpty()) {
+                        name.setError("Enter your Name");
+                    }else if(phone.getText().toString().isEmpty()){
+                        phone.setError("Enter Your Phone");
+                    }else if(offered_service.getVisibility()==View.VISIBLE&&offered_service.getSelectedItem()==null){
+                        offered_service.setError("Select Offered Service");
+                    }else{
+                        firebase_operations.updateProfile(worker_home.this,FirebaseAuth.getInstance().getCurrentUser().getUid(),name.getText().toString(),phone.getText().toString(),offered_service.getSelectedItem().toString());
+                    }
+                }
+            });
         }
         return true;
     }

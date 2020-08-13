@@ -93,11 +93,11 @@ public class projects_list_adapter extends RecyclerView.Adapter<projects_list_ad
                     }
                 });
 
-            }else if(u.getRole().equals("Customer")){
-                context.startActivity(new Intent(context, bidsList.class).putExtra("project_id",projectIds.get(position)).putExtra("project_status",projects.get(position).getStatus()));
             }else if(u.getRole().equals("Customer")&&projects.get(position).getStatus().equals("Allotted")){
                 View completeProjectView=LayoutInflater.from(context).inflate(R.layout.rate_work_layout,null);
                 AppCompatRatingBar rating=completeProjectView.findViewById(R.id.rating);
+                rating.setNumStars(5);
+                rating.setStepSize(1.0f);
                 MaterialEditText comments=completeProjectView.findViewById(R.id.comments);
                AlertDialog completeProjectDialog= new AlertDialog.Builder(context)
                         .setTitle("Rate the Work")
@@ -126,6 +126,8 @@ public class projects_list_adapter extends RecyclerView.Adapter<projects_list_ad
                             }
                         });
 
+            }else if(u.getRole().equals("Customer")){
+                context.startActivity(new Intent(context, bidsList.class).putExtra("project_id",projectIds.get(position)).putExtra("project_status",projects.get(position).getStatus()));
             }
           }
       });
