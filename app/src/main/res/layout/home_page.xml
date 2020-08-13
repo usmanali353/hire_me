@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@android:color/black"
     android:id="@+id/rootlayout"
-    tools:context=".Home"
+    tools:context=".Selection"
     >
     <LinearLayout
         android:orientation="vertical"
@@ -17,7 +17,7 @@
         android:gravity="center_horizontal"
         >
         <TextView
-            android:text="Professional HUB"
+            android:text="Hire Me"
             android:textSize="36sp"
             android:textColor="#fff"
             android:textAlignment="center"
