@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,14 +42,17 @@ import java.util.UUID;
 
 import fr.ganfra.materialspinner.MaterialSpinner;
 import fyp.hireme.Adapters.bids_list_adapter;
+import fyp.hireme.Adapters.fav_projects_adapter;
 import fyp.hireme.Adapters.projects_list_adapter;
 import fyp.hireme.Adapters.user_list_adapter;
 import fyp.hireme.MainActivity;
 import fyp.hireme.Model.Bid;
+import fyp.hireme.Model.favourite_projects;
 import fyp.hireme.Model.project;
 import fyp.hireme.Model.user;
 import fyp.hireme.R;
 import fyp.hireme.Utils.utils;
+import fyp.hireme.dbhelper;
 import fyp.hireme.usersList;
 import fyp.hireme.worker_home;
 
@@ -597,5 +601,19 @@ public class firebase_operations {
                 Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
             }
         });
+    }
+    public static void getFavProjects(Context context,RecyclerView fav_projects) {
+        ArrayList<favourite_projects> projects=new ArrayList<>();
+        Cursor projectList = new dbhelper(context).get_projects(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        if (projectList.getCount() == 0) {
+            Toast.makeText(context, "No Projects Found", Toast.LENGTH_LONG).show();
+        } else {
+            while (projectList.moveToNext()) {
+                projects.add(new favourite_projects(projectList.getString(1),projectList.getString(4),projectList.getString(5),projectList.getString(8),projectList.getString(9),projectList.getString(7),projectList.getString(6),projectList.getString(3)));
+            }
+            if(projects.size()>0){
+                fav_projects.setAdapter(new fav_projects_adapter(projects,context));
+            }
+        }
     }
 }

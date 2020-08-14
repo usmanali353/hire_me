@@ -8,4 +8,8 @@
         android:title="Place Bid"
         android:id="@+id/place_bid"
         />
+    <item
+        android:title="Add Project As favorate"
+        android:id="@+id/fav_projects"
+        />
 </menu>

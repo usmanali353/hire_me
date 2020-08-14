@@ -151,6 +151,8 @@ public class worker_home extends AppCompatActivity {
                     }
                 }
             });
+        }else{
+            startActivity(new Intent(worker_home.this,fav_projects.class));
         }
         return true;
     }

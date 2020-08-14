@@ -94,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             });
+        }else{
+            startActivity(new Intent(MainActivity.this,fav_projects.class));
         }
         return super.onOptionsItemSelected(item);
     }

@@ -4,4 +4,8 @@
         android:title="View Customer Profile"
         android:id="@+id/view_customer_profile"
         />
+    <item
+        android:title="Add Project As favorate"
+        android:id="@+id/fav_projects"
+        />
 </menu>

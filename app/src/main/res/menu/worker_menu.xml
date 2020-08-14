@@ -8,5 +8,9 @@
         android:id="@+id/change_profile"
         android:title="Change Profile"
         />
+    <item
+        android:id="@+id/fav_projects"
+        android:title="Favourite Projects"
+        />
 
 </menu>

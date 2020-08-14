@@ -35,6 +35,7 @@ import fyp.hireme.Model.user;
 import fyp.hireme.R;
 import fyp.hireme.Utils.utils;
 import fyp.hireme.bidsList;
+import fyp.hireme.dbhelper;
 
 public class projects_list_adapter extends RecyclerView.Adapter<projects_list_adapter.project_list_viewholder> {
     ArrayList<project> projects;
@@ -103,19 +104,14 @@ public class projects_list_adapter extends RecyclerView.Adapter<projects_list_ad
                                     }
                                 }
                             });
-                        }
-                        return true;
-                    }
-                });
-                popup.show();
-            }else if(u.getRole().equals("Worker")&&!projects.get(position).getStatus().equals("New Project")){
-                PopupMenu popup = new PopupMenu(context, v);
-                popup.getMenuInflater().inflate(R.menu.worker_popup_p,popup.getMenu());
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        if(item.getItemId()==R.id.view_customer_profile){
-                            firebase_operations.getProfile(context,projects.get(position).getCustomerId(),"Customer");
+                        }else if(item.getItemId()==R.id.fav_projects){
+                           if(new dbhelper(context).check_if_already_exist(FirebaseAuth.getInstance().getCurrentUser().getUid(),projectIds.get(position))>0){
+                               Toast.makeText(context,"Project Already in Favourates List",Toast.LENGTH_LONG).show();
+                           }else{
+                              if (new dbhelper(context).insert_projects(projectIds.get(position),projects.get(position).getImage(),projects.get(position).getTitle(),FirebaseAuth.getInstance().getCurrentUser().getUid(),projects.get(position).getDescription(),projects.get(position).getStatus(),String.valueOf(projects.get(position).getLat()),String.valueOf(projects.get(position).getLng()),projects.get(position).getRequiredService())){
+                                  Toast.makeText(context,"Project Added to favourates List",Toast.LENGTH_LONG).show();
+                              }
+                           }
                         }
                         return true;
                     }
@@ -162,6 +158,14 @@ public class projects_list_adapter extends RecyclerView.Adapter<projects_list_ad
                                     }
                                 }
                             });
+                        }else if(item.getItemId()==R.id.fav_projects){
+                            if(new dbhelper(context).check_if_already_exist(FirebaseAuth.getInstance().getCurrentUser().getUid(),projectIds.get(position))>0){
+                                Toast.makeText(context,"Project Already in Favourates List",Toast.LENGTH_LONG).show();
+                            }else{
+                                if (new dbhelper(context).insert_projects(projectIds.get(position),projects.get(position).getImage(),projects.get(position).getTitle(),FirebaseAuth.getInstance().getCurrentUser().getUid(),projects.get(position).getDescription(),projects.get(position).getStatus(),String.valueOf(projects.get(position).getLat()),String.valueOf(projects.get(position).getLng()),projects.get(position).getRequiredService())){
+                                    Toast.makeText(context,"Project Added to favourates List",Toast.LENGTH_LONG).show();
+                                }
+                            }
                         }
                         return true;
                     }
@@ -169,8 +173,49 @@ public class projects_list_adapter extends RecyclerView.Adapter<projects_list_ad
                 popup.show();
 
 
+            }else if(u.getRole().equals("Worker")&&!projects.get(position).getStatus().equals("New Project")){
+                PopupMenu popup = new PopupMenu(context, v);
+                popup.getMenuInflater().inflate(R.menu.worker_popup_p,popup.getMenu());
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        if(item.getItemId()==R.id.view_customer_profile){
+                            firebase_operations.getProfile(context,projects.get(position).getCustomerId(),"Customer");
+                        }else if(item.getItemId()==R.id.fav_projects){
+                            if(new dbhelper(context).check_if_already_exist(FirebaseAuth.getInstance().getCurrentUser().getUid(),projectIds.get(position))>0){
+                                Toast.makeText(context,"Project Already in Favourates List",Toast.LENGTH_LONG).show();
+                            }else{
+                                if (new dbhelper(context).insert_projects(projectIds.get(position),projects.get(position).getImage(),projects.get(position).getTitle(),FirebaseAuth.getInstance().getCurrentUser().getUid(),projects.get(position).getDescription(),projects.get(position).getStatus(),String.valueOf(projects.get(position).getLat()),String.valueOf(projects.get(position).getLng()),projects.get(position).getRequiredService())){
+                                    Toast.makeText(context,"Project Added to favourates List",Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                });
+                popup.show();
             }else if(u.getRole().equals("Customer")){
-                context.startActivity(new Intent(context, bidsList.class).putExtra("project_id",projectIds.get(position)).putExtra("project_status",projects.get(position).getStatus()));
+                PopupMenu popup = new PopupMenu(context, v);
+                popup.getMenuInflater().inflate(R.menu.customer_another_menu,popup.getMenu());
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        if(item.getItemId()==R.id.go_to_bids){
+                            context.startActivity(new Intent(context, bidsList.class).putExtra("project_id",projectIds.get(position)).putExtra("project_status",projects.get(position).getStatus()));
+                        }else if(item.getItemId()==R.id.fav_projects){
+                            if(new dbhelper(context).check_if_already_exist(FirebaseAuth.getInstance().getCurrentUser().getUid(),projectIds.get(position))>0){
+                                Toast.makeText(context,"Project Already in Favourates List",Toast.LENGTH_LONG).show();
+                            }else{
+                                if (new dbhelper(context).insert_projects(projectIds.get(position),projects.get(position).getImage(),projects.get(position).getTitle(),FirebaseAuth.getInstance().getCurrentUser().getUid(),projects.get(position).getDescription(),projects.get(position).getStatus(),String.valueOf(projects.get(position).getLat()),String.valueOf(projects.get(position).getLng()),projects.get(position).getRequiredService())){
+                                    Toast.makeText(context,"Project Added to favourates List",Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                });
+                popup.show();
+
             }
           }
       });
