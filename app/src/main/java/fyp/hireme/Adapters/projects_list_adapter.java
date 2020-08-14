@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -15,6 +17,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatRatingBar;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.cardview.widget.CardView;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -63,68 +66,108 @@ public class projects_list_adapter extends RecyclerView.Adapter<projects_list_ad
           @Override
           public void onClick(View v) {
             if(u.getRole().equals("Worker")&&projects.get(position).getStatus().equals("New Project")){
-                View place_bid_view=LayoutInflater.from(context).inflate(R.layout.place_bid_layout,null);
-                MaterialEditText price=place_bid_view.findViewById(R.id.bid_price);
-                AlertDialog place_bid_dialog=new AlertDialog.Builder(context)
-                        .setTitle("Place Bid")
-                        .setMessage("Enter Price for Bid")
-                        .setPositiveButton("set", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                            }
-                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        }).setView(place_bid_view).create();
-                place_bid_dialog.show();
-                place_bid_dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                PopupMenu popup = new PopupMenu(context, v);
+                popup.getMenuInflater().inflate(R.menu.worker_popup,popup.getMenu());
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
-                    public void onClick(View v) {
-                        if(price.getText().toString().isEmpty()){
-                            price.setError("Enter Bid Price");
-                        }else if(Integer.parseInt(price.getText().toString())==0&&Integer.parseInt(price.getText().toString())<1000){
-                            price.setError("Bid Price too Low");
-                        }else{
-                            firebase_operations.checkBidsAlreadyExist(context,projectIds.get(position),FirebaseAuth.getInstance().getCurrentUser().getUid(),u.getName(),utils.getCurrentDate(),Integer.parseInt(price.getText().toString()),"New Bid",place_bid_dialog);
+                    public boolean onMenuItemClick(MenuItem item) {
+                        if(item.getItemId()==R.id.view_customer_profile){
+                            firebase_operations.getProfile(context,projects.get(position).getCustomerId(),"Customer");
+                        }else if(item.getItemId()==R.id.place_bid){
+                            View place_bid_view=LayoutInflater.from(context).inflate(R.layout.place_bid_layout,null);
+                            MaterialEditText price=place_bid_view.findViewById(R.id.bid_price);
+                            AlertDialog place_bid_dialog=new AlertDialog.Builder(context)
+                                    .setTitle("Place Bid")
+                                    .setMessage("Enter Price for Bid")
+                                    .setPositiveButton("set", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+
+                                        }
+                                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    }).setView(place_bid_view).create();
+                            place_bid_dialog.show();
+                            place_bid_dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    if(price.getText().toString().isEmpty()){
+                                        price.setError("Enter Bid Price");
+                                    }else if(Integer.parseInt(price.getText().toString())==0&&Integer.parseInt(price.getText().toString())<1000){
+                                        price.setError("Bid Price too Low");
+                                    }else{
+                                        firebase_operations.checkBidsAlreadyExist(context,projectIds.get(position),FirebaseAuth.getInstance().getCurrentUser().getUid(),u.getName(),utils.getCurrentDate(),Integer.parseInt(price.getText().toString()),"New Bid",place_bid_dialog);
+                                    }
+                                }
+                            });
                         }
+                        return true;
                     }
                 });
-
+                popup.show();
+            }else if(u.getRole().equals("Worker")&&!projects.get(position).getStatus().equals("New Project")){
+                PopupMenu popup = new PopupMenu(context, v);
+                popup.getMenuInflater().inflate(R.menu.worker_popup_p,popup.getMenu());
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        if(item.getItemId()==R.id.view_customer_profile){
+                            firebase_operations.getProfile(context,projects.get(position).getCustomerId(),"Customer");
+                        }
+                        return true;
+                    }
+                });
+                popup.show();
             }else if(u.getRole().equals("Customer")&&projects.get(position).getStatus().equals("Allotted")){
-                View completeProjectView=LayoutInflater.from(context).inflate(R.layout.rate_work_layout,null);
-                AppCompatRatingBar rating=completeProjectView.findViewById(R.id.rating);
-                rating.setNumStars(5);
-                rating.setStepSize(1.0f);
-                MaterialEditText comments=completeProjectView.findViewById(R.id.comments);
-               AlertDialog completeProjectDialog= new AlertDialog.Builder(context)
-                        .setTitle("Rate the Work")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
+                PopupMenu popup = new PopupMenu(context, v);
+                popup.getMenuInflater().inflate(R.menu.customer_popup_rwp,popup.getMenu());
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        if(item.getItemId()==R.id.view_worker_profile){
+                            Log.e("allottedTo",projects.get(position).getAllottedTo());
+                            firebase_operations.getProfile(context,projects.get(position).getAllottedTo(),"Worker");
+                        }else if(item.getItemId()==R.id.rate){
+                            View completeProjectView=LayoutInflater.from(context).inflate(R.layout.rate_work_layout,null);
+                            AppCompatRatingBar rating=completeProjectView.findViewById(R.id.rating);
+                            rating.setNumStars(5);
+                            rating.setStepSize(1.0f);
+                            MaterialEditText comments=completeProjectView.findViewById(R.id.comments);
+                            AlertDialog completeProjectDialog= new AlertDialog.Builder(context)
+                                    .setTitle("Rate the Work")
+                                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
 
-                            }
-                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            }
-                        }).setView(completeProjectView).create();
-                        completeProjectDialog.show();
-                        completeProjectDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                if(rating.getRating()==0){
-                                    Toast.makeText(context,"Please Rate",Toast.LENGTH_LONG).show();
-                                }else if(comments.getText().toString().isEmpty()){
-                                    comments.setError("Please Comment on the work");
-                                }else{
-                                    firebase_operations.rateComment(context,projectIds.get(position),String.valueOf(rating.getRating()),comments.getText().toString());
+                                        }
+                                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    }).setView(completeProjectView).create();
+                            completeProjectDialog.show();
+                            completeProjectDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    if(rating.getRating()==0){
+                                        Toast.makeText(context,"Please Rate",Toast.LENGTH_LONG).show();
+                                    }else if(comments.getText().toString().isEmpty()){
+                                        comments.setError("Please Comment on the work");
+                                    }else{
+                                        firebase_operations.rateComment(context,projectIds.get(position),String.valueOf(rating.getRating()),comments.getText().toString());
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
+                        return true;
+                    }
+                });
+                popup.show();
+
 
             }else if(u.getRole().equals("Customer")){
                 context.startActivity(new Intent(context, bidsList.class).putExtra("project_id",projectIds.get(position)).putExtra("project_status",projects.get(position).getStatus()));

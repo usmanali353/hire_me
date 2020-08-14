@@ -30,6 +30,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.gson.Gson;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import fyp.hireme.Firebase_Operations.firebase_operations;
 import fyp.hireme.Fragments.completedProjectsFragment;
 import fyp.hireme.Fragments.ongoingProjects;
 import fyp.hireme.Fragments.projects_for_bids;
+import fyp.hireme.Model.user;
 import fyp.hireme.Utils.utils;
 
 import static android.content.DialogInterface.BUTTON_POSITIVE;
@@ -112,6 +114,14 @@ public class worker_home extends AppCompatActivity {
             MaterialEditText name=v.findViewById(R.id.nametxt);
             MaterialEditText phone=v.findViewById(R.id.phonetxt);
             MaterialSpinner offered_service=v.findViewById(R.id.offered_service);
+            user u=new Gson().fromJson(prefs.getString("user_info",null),user.class);
+            name.setText(u.getName());
+            phone.setText(u.getPhone());
+            for(int i=0;i<getResources().getStringArray(R.array.offered_services).length;i++){
+                if(getResources().getStringArray(R.array.offered_services)[i].equals(u.getOffered_service())){
+                    offered_service.setSelection(i+1);
+                }
+            }
             AlertDialog changeProfileDialog =new AlertDialog.Builder(worker_home.this)
                     .setTitle("Change Profile")
                     .setMessage("Provide Valid Info")
@@ -125,7 +135,7 @@ public class worker_home extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
                         }
-                    }).create();
+                    }).setView(v).create();
             changeProfileDialog.show();
             changeProfileDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                 @Override

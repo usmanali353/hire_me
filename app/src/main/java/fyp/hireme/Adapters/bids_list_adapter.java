@@ -4,12 +4,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.cardview.widget.CardView;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -56,20 +58,47 @@ public class bids_list_adapter extends RecyclerView.Adapter<bids_list_adapter.bi
             @Override
             public void onClick(View v) {
                 if(u.getRole().equals("Customer")&&bids.get(position).getStatus().equals("New Bid")&&projectStatus.equals("New Project")){
-                    new AlertDialog.Builder(context)
-                            .setTitle("Accept Bid")
-                            .setMessage("are you sure you want to accept this bid ?")
-                            .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    firebase_operations.acceptBid(context,bidId.get(position),projectId,bids.get(position).getMechanicId());
-                                }
-                            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            }).show();
+                    PopupMenu popup = new PopupMenu(context, v);
+                    popup.getMenuInflater().inflate(R.menu.customer_popup,popup.getMenu());
+                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            if(item.getItemId()==R.id.view_worker_profile){
+                                firebase_operations.getProfile(context,bids.get(position).getMechanicId(),"Worker");
+                            }else if(item.getItemId()==R.id.accept_bid){
+                                new AlertDialog.Builder(context)
+                                        .setTitle("Accept Bid")
+                                        .setMessage("are you sure you want to accept this bid ?")
+                                        .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                firebase_operations.acceptBid(context,bidId.get(position),projectId,bids.get(position).getMechanicId());
+                                            }
+                                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                }).show();
+                            }
+                            return true;
+                        }
+                    });
+                    popup.show();
+
+                }else{
+                    PopupMenu popup = new PopupMenu(context, v);
+                    popup.getMenuInflater().inflate(R.menu.customer_popup_wp,popup.getMenu());
+                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            if(item.getItemId()==R.id.view_worker_profile){
+                                firebase_operations.getProfile(context,bids.get(position).getMechanicId(),"Worker");
+                            }
+                            return true;
+                        }
+                    });
+                    popup.show();
                 }
             }
         });

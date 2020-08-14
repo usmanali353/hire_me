@@ -9,6 +9,7 @@ import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.gson.Gson;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import androidx.annotation.NonNull;
@@ -25,6 +26,7 @@ import android.view.View;
 
 import fr.ganfra.materialspinner.MaterialSpinner;
 import fyp.hireme.Firebase_Operations.firebase_operations;
+import fyp.hireme.Model.user;
 
 public class MainActivity extends AppCompatActivity {
  RecyclerView projects_list;
@@ -62,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
             MaterialEditText phone=v.findViewById(R.id.phonetxt);
             MaterialSpinner offered_service=v.findViewById(R.id.offered_service);
             offered_service.setVisibility(View.GONE);
+            user u=new Gson().fromJson(prefs.getString("user_info",null),user.class);
+            name.setText(u.getName());
+            phone.setText(u.getPhone());
             AlertDialog changeProfileDialog =new AlertDialog.Builder(MainActivity.this)
                     .setTitle("Change Profile")
                     .setMessage("Provide Valid Info")
@@ -75,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
                         }
-                    }).create();
+                    }).setView(v).create();
             changeProfileDialog.show();
             changeProfileDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                 @Override

@@ -6,6 +6,15 @@ public class project {
     String image;
     String comments;
     String rating;
+    String allottedTo;
+
+    public String getAllottedTo() {
+        return allottedTo;
+    }
+
+    public void setAllottedTo(String allottedTo) {
+        this.allottedTo = allottedTo;
+    }
 
     public String getComments() {
         return comments;

@@ -3,9 +3,12 @@ package fyp.hireme.Firebase_Operations;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -27,6 +30,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
+import com.rengwuxian.materialedittext.MaterialEditText;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,6 +39,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import fr.ganfra.materialspinner.MaterialSpinner;
 import fyp.hireme.Adapters.bids_list_adapter;
 import fyp.hireme.Adapters.projects_list_adapter;
 import fyp.hireme.Adapters.user_list_adapter;
@@ -42,6 +47,7 @@ import fyp.hireme.MainActivity;
 import fyp.hireme.Model.Bid;
 import fyp.hireme.Model.project;
 import fyp.hireme.Model.user;
+import fyp.hireme.R;
 import fyp.hireme.Utils.utils;
 import fyp.hireme.usersList;
 import fyp.hireme.worker_home;
@@ -529,6 +535,7 @@ public class firebase_operations {
             public void onComplete(@NonNull Task<Void> task) {
                 pd.dismiss();
                 if(task.isSuccessful()){
+                    prefs.edit().putString("user_info",new Gson().toJson(new user(name,u.getEmail(),phone,u.getPassword(),u.getRole(),offeredService))).apply();
                     Toast.makeText(context,"Profile Updated",Toast.LENGTH_LONG).show();
                     if(u.getRole().equals("Customer")) {
                         context.startActivity(new Intent(context, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
@@ -544,6 +551,50 @@ public class firebase_operations {
             public void onFailure(@NonNull Exception e) {
                 pd.dismiss();
              Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+    public static void getProfile(Context context,String userId,String profileType){
+        ProgressDialog pd=new ProgressDialog(context);
+        pd.setMessage("Fetching Profile....");
+        pd.show();
+        FirebaseFirestore.getInstance().collection("Users").document(userId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                pd.dismiss();
+                if(documentSnapshot.exists()){
+                    user u=documentSnapshot.toObject(user.class);
+                    View v= LayoutInflater.from(context).inflate(R.layout.profile_layout,null);
+                    MaterialEditText name=v.findViewById(R.id.nametxt);
+                    MaterialEditText phone=v.findViewById(R.id.phonetxt);
+                    MaterialEditText email=v.findViewById(R.id.emailtxt);
+                    MaterialEditText offered_service=v.findViewById(R.id.offeredService);
+                    if(u.getRole().equals("Customer")) {
+                        offered_service.setVisibility(View.GONE);
+                    }
+                    email.setText(u.getEmail());
+                    name.setText(u.getName());
+                    phone.setText(u.getPhone());
+                    if(u.getRole().equals("Worker")&&u.getOffered_service()!=null){
+                        offered_service.setVisibility(View.VISIBLE);
+                        offered_service.setText(u.getOffered_service());
+                    }
+                    AlertDialog changeProfileDialog =new AlertDialog.Builder(context)
+                            .setTitle(profileType+" "+"Profile")
+                           .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            }).setView(v).create();
+                    changeProfileDialog.show();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                pd.dismiss();
+                Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
             }
         });
     }
