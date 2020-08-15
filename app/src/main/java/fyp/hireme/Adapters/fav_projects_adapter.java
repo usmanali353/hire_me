@@ -3,6 +3,9 @@ package fyp.hireme.Adapters;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.location.Address;
+import android.location.Geocoder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +21,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 import fyp.hireme.Firebase_Operations.firebase_operations;
 import fyp.hireme.Model.favourite_projects;
@@ -44,7 +49,16 @@ Context context;
         holder.title.setText(projects.get(position).getTitle());
         holder.description.setText(projects.get(position).getDescription());
         holder.status.setText("Status "+projects.get(position).getStatus());
+        holder.budget.setText("Budget: Rs "+projects.get(position).getBudget());
         Picasso.get().load(projects.get(position).getImage()).into(holder.projectImage);
+        try{
+            Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+            List<Address> addresses = geocoder.getFromLocation(Double.parseDouble(projects.get(position).getLatitude()),Double.parseDouble(projects.get(position).getLongitude()), 1);
+            holder.location.setText(addresses.get(0).getLocality()+" - "+addresses.get(0).getCountryName());
+        }catch(Exception e){
+            e.printStackTrace();
+            Log.e("exp",e.getMessage());
+        }
         holder.card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -82,7 +96,7 @@ Context context;
     }
 
     class fav_projects_viewholder extends RecyclerView.ViewHolder{
-        TextView title,description,status;
+        TextView title,description,status,location,budget;
         ImageView projectImage;
         CardView card;
         public fav_projects_viewholder(@NonNull View itemView) {
@@ -92,6 +106,8 @@ Context context;
             description=itemView.findViewById(R.id.description);
             projectImage=itemView.findViewById(R.id.icon);
             card=itemView.findViewById(R.id.card);
+            location=itemView.findViewById(R.id.location);
+            budget=itemView.findViewById(R.id.budget);
         }
     }
 }

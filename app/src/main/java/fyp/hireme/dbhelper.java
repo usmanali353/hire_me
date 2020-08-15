@@ -9,8 +9,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class dbhelper extends SQLiteOpenHelper {
     Context c;
-    String[] columns={"id","projectId","userId","image","title","description","requiredService","status","latitude","longitude"};
-    String creat_table="create table projects (id integer primary key autoincrement,projectId text,userId text,image text,requiredService text,latitude text,longitude text,status text,title text,description text);";
+    String[] columns={"id","projectId","userId","image","title","description","requiredService","status","latitude","longitude","budget"};
+    String creat_table="create table projects (id integer primary key autoincrement,projectId text,userId text,image text,requiredService text,latitude text,longitude text,status text,title text,description text,budget integer);";
     public dbhelper(Context context) {
         super(context,"projects", null, 1);
         this.c=context;
@@ -25,7 +25,7 @@ public class dbhelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS projects");
         onCreate(sqLiteDatabase);
     }
-    public Boolean insert_projects(String projectId, String image, String title, String Username, String description, String status,String latitude,String longitude,String requiredService){
+    public Boolean insert_projects(String projectId, String image, String title, String Username, String description, String status,String latitude,String longitude,String requiredService,int budget){
         SQLiteDatabase db=getWritableDatabase();
         ContentValues cv=new ContentValues();
         cv.put("projectId ",projectId);
@@ -37,6 +37,7 @@ public class dbhelper extends SQLiteOpenHelper {
         cv.put("latitude",latitude);
         cv.put("longitude",longitude);
         cv.put("requiredService",requiredService);
+        cv.put("budget",budget);
         long i= db.insert("projects",null,cv);
         if(i==-1){
             return false;

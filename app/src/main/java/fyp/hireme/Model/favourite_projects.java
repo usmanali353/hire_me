@@ -11,7 +11,7 @@ public class favourite_projects {
         this.projectId = projectId;
     }
 
-    public favourite_projects(String projectId, String title, String description, String latitude, String longitude, String status, String requiredService, String image) {
+    public favourite_projects(String projectId, String title, String description, String latitude, String longitude, String status, String requiredService, String image,int budget) {
         this.projectId = projectId;
         this.title = title;
         this.description = description;
@@ -20,6 +20,7 @@ public class favourite_projects {
         this.status = status;
         this.requiredService = requiredService;
         this.image = image;
+        this.budget=budget;
     }
 
     String title;
@@ -29,6 +30,15 @@ public class favourite_projects {
     String status;
     String requiredService;
     String image;
+    int budget;
+
+    public int getBudget() {
+        return budget;
+    }
+
+    public void setBudget(int budget) {
+        this.budget = budget;
+    }
 
     public String getTitle() {
         return title;

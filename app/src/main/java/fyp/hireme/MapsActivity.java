@@ -65,7 +65,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.clear();
                 mMap.addMarker(new MarkerOptions().position(latLng).title("Selected Location"));
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                firebase_operations.addProject(MapsActivity.this,getIntent().getStringExtra("title"),getIntent().getStringExtra("description"), Uri.parse(getIntent().getStringExtra("image_uri")),latLng.latitude,latLng.longitude,getIntent().getStringExtra("service_for"));
+                firebase_operations.addProject(MapsActivity.this,getIntent().getStringExtra("title"),getIntent().getStringExtra("description"), Uri.parse(getIntent().getStringExtra("image_uri")),latLng.latitude,latLng.longitude,getIntent().getStringExtra("service_for"),Integer.parseInt(getIntent().getStringExtra("budget")));
             }
         });
 

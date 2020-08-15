@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Address;
+import android.location.Geocoder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -28,6 +30,8 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 import fyp.hireme.Firebase_Operations.firebase_operations;
 import fyp.hireme.Model.project;
@@ -62,7 +66,17 @@ public class projects_list_adapter extends RecyclerView.Adapter<projects_list_ad
       holder.title.setText(projects.get(position).getTitle());
       holder.description.setText(projects.get(position).getDescription());
       holder.status.setText("Status "+projects.get(position).getStatus());
+      holder.budget.setText("Budget: Rs "+projects.get(position).getBudget());
       Picasso.get().load(projects.get(position).getImage()).into(holder.projectImage);
+      try{
+          Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+          List<Address> addresses = geocoder.getFromLocation(projects.get(position).getLat(), projects.get(position).getLng(), 1);
+          holder.location.setText(addresses.get(0).getLocality()+" - "+addresses.get(0).getCountryName());
+      }catch(Exception e){
+          e.printStackTrace();
+          Log.e("exp",e.getMessage());
+      }
+
       holder.card.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View v) {
@@ -99,6 +113,8 @@ public class projects_list_adapter extends RecyclerView.Adapter<projects_list_ad
                                         price.setError("Enter Bid Price");
                                     }else if(Integer.parseInt(price.getText().toString())==0&&Integer.parseInt(price.getText().toString())<1000){
                                         price.setError("Bid Price too Low");
+                                    }else if(Integer.parseInt(price.getText().toString())>projects.get(position).getBudget()){
+                                        price.setError("Bid Price Should be Lower then Project Budget");
                                     }else{
                                         firebase_operations.checkBidsAlreadyExist(context,projectIds.get(position),FirebaseAuth.getInstance().getCurrentUser().getUid(),u.getName(),utils.getCurrentDate(),Integer.parseInt(price.getText().toString()),"New Bid",place_bid_dialog);
                                     }
@@ -108,7 +124,7 @@ public class projects_list_adapter extends RecyclerView.Adapter<projects_list_ad
                            if(new dbhelper(context).check_if_already_exist(FirebaseAuth.getInstance().getCurrentUser().getUid(),projectIds.get(position))>0){
                                Toast.makeText(context,"Project Already in Favourates List",Toast.LENGTH_LONG).show();
                            }else{
-                              if (new dbhelper(context).insert_projects(projectIds.get(position),projects.get(position).getImage(),projects.get(position).getTitle(),FirebaseAuth.getInstance().getCurrentUser().getUid(),projects.get(position).getDescription(),projects.get(position).getStatus(),String.valueOf(projects.get(position).getLat()),String.valueOf(projects.get(position).getLng()),projects.get(position).getRequiredService())){
+                              if (new dbhelper(context).insert_projects(projectIds.get(position),projects.get(position).getImage(),projects.get(position).getTitle(),FirebaseAuth.getInstance().getCurrentUser().getUid(),projects.get(position).getDescription(),projects.get(position).getStatus(),String.valueOf(projects.get(position).getLat()),String.valueOf(projects.get(position).getLng()),projects.get(position).getRequiredService(),projects.get(position).getBudget())){
                                   Toast.makeText(context,"Project Added to favourates List",Toast.LENGTH_LONG).show();
                               }
                            }
@@ -162,7 +178,7 @@ public class projects_list_adapter extends RecyclerView.Adapter<projects_list_ad
                             if(new dbhelper(context).check_if_already_exist(FirebaseAuth.getInstance().getCurrentUser().getUid(),projectIds.get(position))>0){
                                 Toast.makeText(context,"Project Already in Favourates List",Toast.LENGTH_LONG).show();
                             }else{
-                                if (new dbhelper(context).insert_projects(projectIds.get(position),projects.get(position).getImage(),projects.get(position).getTitle(),FirebaseAuth.getInstance().getCurrentUser().getUid(),projects.get(position).getDescription(),projects.get(position).getStatus(),String.valueOf(projects.get(position).getLat()),String.valueOf(projects.get(position).getLng()),projects.get(position).getRequiredService())){
+                                if (new dbhelper(context).insert_projects(projectIds.get(position),projects.get(position).getImage(),projects.get(position).getTitle(),FirebaseAuth.getInstance().getCurrentUser().getUid(),projects.get(position).getDescription(),projects.get(position).getStatus(),String.valueOf(projects.get(position).getLat()),String.valueOf(projects.get(position).getLng()),projects.get(position).getRequiredService(),projects.get(position).getBudget())){
                                     Toast.makeText(context,"Project Added to favourates List",Toast.LENGTH_LONG).show();
                                 }
                             }
@@ -185,7 +201,7 @@ public class projects_list_adapter extends RecyclerView.Adapter<projects_list_ad
                             if(new dbhelper(context).check_if_already_exist(FirebaseAuth.getInstance().getCurrentUser().getUid(),projectIds.get(position))>0){
                                 Toast.makeText(context,"Project Already in Favourates List",Toast.LENGTH_LONG).show();
                             }else{
-                                if (new dbhelper(context).insert_projects(projectIds.get(position),projects.get(position).getImage(),projects.get(position).getTitle(),FirebaseAuth.getInstance().getCurrentUser().getUid(),projects.get(position).getDescription(),projects.get(position).getStatus(),String.valueOf(projects.get(position).getLat()),String.valueOf(projects.get(position).getLng()),projects.get(position).getRequiredService())){
+                                if (new dbhelper(context).insert_projects(projectIds.get(position),projects.get(position).getImage(),projects.get(position).getTitle(),FirebaseAuth.getInstance().getCurrentUser().getUid(),projects.get(position).getDescription(),projects.get(position).getStatus(),String.valueOf(projects.get(position).getLat()),String.valueOf(projects.get(position).getLng()),projects.get(position).getRequiredService(),projects.get(position).getBudget())){
                                     Toast.makeText(context,"Project Added to favourates List",Toast.LENGTH_LONG).show();
                                 }
                             }
@@ -206,7 +222,7 @@ public class projects_list_adapter extends RecyclerView.Adapter<projects_list_ad
                             if(new dbhelper(context).check_if_already_exist(FirebaseAuth.getInstance().getCurrentUser().getUid(),projectIds.get(position))>0){
                                 Toast.makeText(context,"Project Already in Favourates List",Toast.LENGTH_LONG).show();
                             }else{
-                                if (new dbhelper(context).insert_projects(projectIds.get(position),projects.get(position).getImage(),projects.get(position).getTitle(),FirebaseAuth.getInstance().getCurrentUser().getUid(),projects.get(position).getDescription(),projects.get(position).getStatus(),String.valueOf(projects.get(position).getLat()),String.valueOf(projects.get(position).getLng()),projects.get(position).getRequiredService())){
+                                if (new dbhelper(context).insert_projects(projectIds.get(position),projects.get(position).getImage(),projects.get(position).getTitle(),FirebaseAuth.getInstance().getCurrentUser().getUid(),projects.get(position).getDescription(),projects.get(position).getStatus(),String.valueOf(projects.get(position).getLat()),String.valueOf(projects.get(position).getLng()),projects.get(position).getRequiredService(),projects.get(position).getBudget())){
                                     Toast.makeText(context,"Project Added to favourates List",Toast.LENGTH_LONG).show();
                                 }
                             }
@@ -227,7 +243,7 @@ public class projects_list_adapter extends RecyclerView.Adapter<projects_list_ad
     }
 
     class project_list_viewholder extends RecyclerView.ViewHolder{
-  TextView title,description,status;
+  TextView title,description,status,location,budget;
   ImageView projectImage;
   CardView card;
      public project_list_viewholder(@NonNull View itemView) {
@@ -237,6 +253,8 @@ public class projects_list_adapter extends RecyclerView.Adapter<projects_list_ad
          description=itemView.findViewById(R.id.description);
          projectImage=itemView.findViewById(R.id.icon);
          card=itemView.findViewById(R.id.card);
+         location=itemView.findViewById(R.id.location);
+         budget=itemView.findViewById(R.id.budget);
      }
  }
 }

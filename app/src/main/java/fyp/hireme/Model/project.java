@@ -7,6 +7,15 @@ public class project {
     String comments;
     String rating;
     String allottedTo;
+    int budget;
+
+    public int getBudget() {
+        return budget;
+    }
+
+    public void setBudget(int budget) {
+        this.budget = budget;
+    }
 
     public String getAllottedTo() {
         return allottedTo;
@@ -70,7 +79,7 @@ public class project {
     String date;
     double lat,lng;
 
-    public project(String title, String description, String image, double lat, double lng,String date,String customerId,String status,String requiredService) {
+    public project(String title, String description, String image, double lat, double lng,String date,String customerId,String status,String requiredService,int budget) {
         this.title = title;
         this.description = description;
         this.image = image;
@@ -80,6 +89,7 @@ public class project {
         this.customerId=customerId;
         this.status=status;
         this.requiredService=requiredService;
+        this.budget=budget;
     }
     public project(){
 

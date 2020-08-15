@@ -23,7 +23,7 @@ import android.widget.Toast;
 import fr.ganfra.materialspinner.MaterialSpinner;
 
 public class add_project extends AppCompatActivity {
-MaterialEditText projectTitle,projectDescription;
+MaterialEditText projectTitle,projectDescription,budget;
 MaterialSpinner serviceFor;
 Button proceed;
 ImageView img;
@@ -40,6 +40,7 @@ String resultUri;
         projectDescription=findViewById(R.id.description);
         serviceFor=findViewById(R.id.project_for);
         proceed=findViewById(R.id.proceed);
+        budget=findViewById(R.id.budget);
         img=findViewById(R.id.img);
         img.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,8 +61,12 @@ String resultUri;
                     serviceFor.setError("Select something from Dropdown");
                 }else if(bitmap==null){
                     Toast.makeText(add_project.this,"You have not selected any Image",Toast.LENGTH_LONG).show();
+                }else if(budget.getText().toString().isEmpty()){
+                    budget.setError("Enter Your Project Budget");
+                }else if(Integer.parseInt(budget.getText().toString())==0||Integer.parseInt(budget.getText().toString())<1000){
+                    budget.setError("Project Budget too Low");
                 }else{
-                    startActivity(new Intent(add_project.this,MapsActivity.class).putExtra("title",projectTitle.getText().toString()).putExtra("description",projectDescription.getText().toString()).putExtra("image_uri",image_project_uri.toString()).putExtra("service_for",serviceFor.getSelectedItem().toString()));
+                    startActivity(new Intent(add_project.this,MapsActivity.class).putExtra("title",projectTitle.getText().toString()).putExtra("description",projectDescription.getText().toString()).putExtra("image_uri",image_project_uri.toString()).putExtra("budget",budget.getText().toString()).putExtra("service_for",serviceFor.getSelectedItem().toString()));
                 }
             }
         });

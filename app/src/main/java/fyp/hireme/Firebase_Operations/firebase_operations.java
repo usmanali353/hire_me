@@ -173,7 +173,7 @@ public class firebase_operations {
             }
         });
     }
-    public static void addProject(Context context, String title, String description, Uri image,double lat,double lng,String serviceFrom){
+    public static void addProject(Context context, String title, String description, Uri image,double lat,double lng,String serviceFrom,int budget){
         ProgressDialog pd=new ProgressDialog(context);
         pd.setMessage("Adding Project...");
         pd.show();
@@ -188,7 +188,7 @@ public class firebase_operations {
                  public void onSuccess(Uri uri) {
                      pd.dismiss();
 
-                     project p=new project(title,description,uri.toString(),lat,lng,utils.getCurrentDate(),FirebaseAuth.getInstance().getCurrentUser().getUid(),"New Project",serviceFrom);
+                     project p=new project(title,description,uri.toString(),lat,lng,utils.getCurrentDate(),FirebaseAuth.getInstance().getCurrentUser().getUid(),"New Project",serviceFrom,budget);
                      FirebaseFirestore.getInstance().collection("Project").document().set(p).addOnCompleteListener(new OnCompleteListener<Void>() {
                          @Override
                          public void onComplete(@NonNull Task<Void> task) {
@@ -609,7 +609,7 @@ public class firebase_operations {
             Toast.makeText(context, "No Projects Found", Toast.LENGTH_LONG).show();
         } else {
             while (projectList.moveToNext()) {
-                projects.add(new favourite_projects(projectList.getString(1),projectList.getString(4),projectList.getString(5),projectList.getString(8),projectList.getString(9),projectList.getString(7),projectList.getString(6),projectList.getString(3)));
+                projects.add(new favourite_projects(projectList.getString(1),projectList.getString(4),projectList.getString(5),projectList.getString(8),projectList.getString(9),projectList.getString(7),projectList.getString(6),projectList.getString(3),projectList.getInt(10)));
             }
             if(projects.size()>0){
                 fav_projects.setAdapter(new fav_projects_adapter(projects,context));
