@@ -50,6 +50,7 @@ import fyp.hireme.Adapters.user_list_adapter;
 import fyp.hireme.MainActivity;
 import fyp.hireme.Model.Bid;
 import fyp.hireme.Model.Notifications;
+import fyp.hireme.Model.Requests;
 import fyp.hireme.Model.favourite_projects;
 import fyp.hireme.Model.project;
 import fyp.hireme.Model.user;
@@ -154,6 +155,19 @@ public class firebase_operations {
                             pd.dismiss();
                             registerDialog.dismiss();
                             if(task.isSuccessful()){
+                                FirebaseFirestore.getInstance().collection("Requests").document().set(new Requests(utils.getCurrentDate(),FirebaseAuth.getInstance().getCurrentUser().getUid(),email,role,"New Request")).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if(task.isSuccessful()){
+                                            Toast.makeText(context,"Approval Request is sent",Toast.LENGTH_LONG).show();
+                                        }
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+                                    }
+                                });
                                 Toast.makeText(context,"User Registered Sucessfully",Toast.LENGTH_LONG).show();
                             }
                         }

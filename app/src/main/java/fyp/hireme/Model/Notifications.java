@@ -8,6 +8,9 @@ public class Notifications {
         this.date = date;
         this.message = message;
     }
+    public Notifications(){
+
+    }
 
     public String getTitle() {
         return title;
