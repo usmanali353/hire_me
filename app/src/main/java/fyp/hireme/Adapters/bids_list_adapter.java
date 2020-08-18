@@ -67,17 +67,22 @@ public class bids_list_adapter extends RecyclerView.Adapter<bids_list_adapter.bi
                                 firebase_operations.getProfile(context,bids.get(position).getMechanicId(),"Worker");
                             }else if(item.getItemId()==R.id.accept_bid){
                                 new AlertDialog.Builder(context)
-                                        .setTitle("Accept Bid")
-                                        .setMessage("are you sure you want to accept this bid ?")
+                                        .setTitle("Accept/Reject Bid")
+                                        .setMessage("What You want to Do with this Bid?")
                                         .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
-                                                firebase_operations.acceptBid(context,bidId.get(position),projectId,bids.get(position).getMechanicId());
+                                                firebase_operations.acceptBid(context,bidId.get(position),projectId,bids.get(position).getMechanicId(),bids.get(position).getProjectTitle());
                                             }
                                         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         dialog.dismiss();
+                                    }
+                                }).setNeutralButton("Reject", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        firebase_operations.rejectBid(context,bidId.get(position),bids.get(position).getMechanicId(),bids.get(position).getProjectTitle());
                                     }
                                 }).show();
                             }

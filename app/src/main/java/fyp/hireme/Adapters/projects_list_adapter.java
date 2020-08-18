@@ -116,7 +116,7 @@ public class projects_list_adapter extends RecyclerView.Adapter<projects_list_ad
                                     }else if(Integer.parseInt(price.getText().toString())>projects.get(position).getBudget()){
                                         price.setError("Bid Price Should be Lower then Project Budget");
                                     }else{
-                                        firebase_operations.checkBidsAlreadyExist(context,projectIds.get(position),FirebaseAuth.getInstance().getCurrentUser().getUid(),u.getName(),utils.getCurrentDate(),Integer.parseInt(price.getText().toString()),"New Bid",place_bid_dialog);
+                                        firebase_operations.checkBidsAlreadyExist(context,projectIds.get(position),FirebaseAuth.getInstance().getCurrentUser().getUid(),u.getName(),utils.getCurrentDate(),Integer.parseInt(price.getText().toString()),"New Bid",place_bid_dialog,projects.get(position).getTitle());
                                     }
                                 }
                             });

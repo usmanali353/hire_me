@@ -4,6 +4,15 @@ public class Bid {
     String mechanic_name;
     String bid_date;
     String projectId;
+    String projectTitle;
+
+    public String getProjectTitle() {
+        return projectTitle;
+    }
+
+    public void setProjectTitle(String projectTitle) {
+        this.projectTitle = projectTitle;
+    }
 
     public String getMechanicId() {
         return mechanicId;
@@ -25,13 +34,14 @@ public class Bid {
     String status;
     int bid_price;
 
-    public Bid(String mechanic_name, String bid_date, String projectId, int bid_price,String status,String mechanicId) {
+    public Bid(String mechanic_name, String bid_date, String projectId, int bid_price,String status,String mechanicId,String projectTitle) {
         this.mechanic_name = mechanic_name;
         this.bid_date = bid_date;
         this.projectId = projectId;
         this.bid_price = bid_price;
         this.status=status;
         this.mechanicId=mechanicId;
+        this.projectTitle=projectTitle;
     }
 
     public Bid(){

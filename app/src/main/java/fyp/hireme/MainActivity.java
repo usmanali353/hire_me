@@ -94,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             });
+        }else if(item.getItemId()==R.id.notifications){
+            startActivity(new Intent(MainActivity.this,Notifications.class));
         }else{
             startActivity(new Intent(MainActivity.this,fav_projects.class));
         }

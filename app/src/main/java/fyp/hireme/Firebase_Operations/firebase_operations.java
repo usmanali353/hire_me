@@ -44,10 +44,12 @@ import java.util.UUID;
 import fr.ganfra.materialspinner.MaterialSpinner;
 import fyp.hireme.Adapters.bids_list_adapter;
 import fyp.hireme.Adapters.fav_projects_adapter;
+import fyp.hireme.Adapters.notification_list_adapter;
 import fyp.hireme.Adapters.projects_list_adapter;
 import fyp.hireme.Adapters.user_list_adapter;
 import fyp.hireme.MainActivity;
 import fyp.hireme.Model.Bid;
+import fyp.hireme.Model.Notifications;
 import fyp.hireme.Model.favourite_projects;
 import fyp.hireme.Model.project;
 import fyp.hireme.Model.user;
@@ -145,7 +147,7 @@ public class firebase_operations {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
-                    user u=new user(name,email,phone,password,role,offered_service);
+                    user u=new user(name,email,phone,password,role,offered_service,"Unverified");
                     FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).set(u).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
@@ -282,11 +284,11 @@ public class firebase_operations {
         });
 
     }
-    public static void AddBid(Context context,String mechanic_name,String bidDate,String projectId,int price,String status,AlertDialog bidDialog){
+    public static void AddBid(Context context,String mechanic_name,String bidDate,String projectId,int price,String status,AlertDialog bidDialog,String projectTitle){
      ProgressDialog pd=new ProgressDialog(context);
      pd.setMessage("adding Bid...");
      pd.show();
-     FirebaseFirestore.getInstance().collection("Bid").document().set(new Bid(mechanic_name,bidDate,projectId,price,status,FirebaseAuth.getInstance().getCurrentUser().getUid())).addOnCompleteListener(new OnCompleteListener<Void>() {
+     FirebaseFirestore.getInstance().collection("Bid").document().set(new Bid(mechanic_name,bidDate,projectId,price,status,FirebaseAuth.getInstance().getCurrentUser().getUid(),projectTitle)).addOnCompleteListener(new OnCompleteListener<Void>() {
          @Override
          public void onComplete(@NonNull Task<Void> task) {
              pd.dismiss();
@@ -304,7 +306,7 @@ public class firebase_operations {
          }
      });
     }
-    public static void checkBidsAlreadyExist(Context context,String projectId,String workerId,String mechanic_name,String bidDate,int price,String status,AlertDialog bidDialog){
+    public static void checkBidsAlreadyExist(Context context,String projectId,String workerId,String mechanic_name,String bidDate,int price,String status,AlertDialog bidDialog,String projectTitle){
         ProgressDialog pd=new ProgressDialog(context);
         pd.setMessage("checking if already Bidded...");
         pd.show();
@@ -315,7 +317,7 @@ public class firebase_operations {
                 if(queryDocumentSnapshots.getDocuments().size()>0){
                     Toast.makeText(context,"You have already bidded on this project",Toast.LENGTH_LONG).show();
                 }else{
-                    AddBid(context,mechanic_name,bidDate,projectId,price,status,bidDialog);
+                    AddBid(context,mechanic_name,bidDate,projectId,price,status,bidDialog,projectTitle);
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -338,8 +340,11 @@ public class firebase_operations {
                 pd.dismiss();
                 if(queryDocumentSnapshots.getDocuments().size()>0){
                   for(int i=0;i<queryDocumentSnapshots.getDocuments().size();i++){
-                      bids.add(queryDocumentSnapshots.getDocuments().get(i).toObject(Bid.class));
-                      bidId.add(queryDocumentSnapshots.getDocuments().get(i).getId());
+                      Bid b=queryDocumentSnapshots.getDocuments().get(i).toObject(Bid.class);
+                      if(b.getStatus().equals("Accepted")||b.getStatus().equals("New Bid")) {
+                          bids.add(queryDocumentSnapshots.getDocuments().get(i).toObject(Bid.class));
+                          bidId.add(queryDocumentSnapshots.getDocuments().get(i).getId());
+                      }
                   }
                    bidList.setAdapter(new bids_list_adapter(context,bids,bidId,projectId,bidStatus));
                 }
@@ -352,7 +357,7 @@ public class firebase_operations {
             }
         });
     }
-    public static void acceptBid(Context context,String bidId,String projectId,String workerId){
+    public static void acceptBid(Context context,String bidId,String projectId,String workerId,String projectTitle){
         ProgressDialog pd=new ProgressDialog(context);
         pd.setMessage("Please Wait...");
         pd.show();
@@ -370,6 +375,7 @@ public class firebase_operations {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if(task.isSuccessful()){
+                                createNotification(context,"Your Bid is Accepted by Customer","Bid you had placed on project titled "+projectTitle+" was Accepted by the Customer",workerId);
                                 Toast.makeText(context,"Bid Accepted",Toast.LENGTH_LONG).show();
                                 context.startActivity(new Intent(context,MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP));
                                 ((AppCompatActivity)context).finish();
@@ -554,7 +560,7 @@ public class firebase_operations {
             public void onComplete(@NonNull Task<Void> task) {
                 pd.dismiss();
                 if(task.isSuccessful()){
-                    prefs.edit().putString("user_info",new Gson().toJson(new user(name,u.getEmail(),phone,u.getPassword(),u.getRole(),offeredService))).apply();
+                    prefs.edit().putString("user_info",new Gson().toJson(new user(name,u.getEmail(),phone,u.getPassword(),u.getRole(),offeredService,u.getStatus()))).apply();
                     Toast.makeText(context,"Profile Updated",Toast.LENGTH_LONG).show();
                     if(u.getRole().equals("Customer")) {
                         context.startActivity(new Intent(context, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
@@ -630,5 +636,71 @@ public class firebase_operations {
                 fav_projects.setAdapter(new fav_projects_adapter(projects,context));
             }
         }
+    }
+    public static void rejectBid(Context context,String bidId,String WorkerId,String projectTitle){
+        ProgressDialog pd=new ProgressDialog(context);
+        pd.setMessage("Rejecting Bid....");
+        pd.show();
+        Map<String,Object> bidUpdateData=new HashMap<>();
+        bidUpdateData.put("status","Rejected");
+        FirebaseFirestore.getInstance().collection("Bid").document(bidId).update(bidUpdateData).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                pd.dismiss();
+                if(task.isSuccessful()){
+                    createNotification(context,"Your Bid is Rejected by Customer","Bid you had placed on project titled "+projectTitle+" was Rejected by the Customer",WorkerId);
+                    Toast.makeText(context,"Bid Rejected",Toast.LENGTH_LONG).show();
+                    context.startActivity(new Intent(context,MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                    ((AppCompatActivity)context).finish();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                pd.dismiss();
+                Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+    public static void createNotification(Context context,String title,String message,String workerId){
+        FirebaseFirestore.getInstance().collection("Notification").document(workerId).collection("user_notifications").document().set(new Notifications(title,utils.getCurrentDate(),message)).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+    public static void getNotifications(Context context,RecyclerView notificationList,String workerId){
+        ProgressDialog pd=new ProgressDialog(context);
+        pd.setMessage("Fetching Notifications....");
+        pd.show();
+        ArrayList<Notifications> notifications=new ArrayList<>();
+        ArrayList<String> notificationIds=new ArrayList<>();
+        FirebaseFirestore.getInstance().collection("Notification").document(workerId).collection("user_notifications").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                pd.dismiss();
+                if(queryDocumentSnapshots.getDocuments().size()>0){
+                    for(int i=0;i<queryDocumentSnapshots.getDocuments().size();i++){
+                        notifications.add(queryDocumentSnapshots.getDocuments().get(i).toObject(Notifications.class));
+                        notificationIds.add(queryDocumentSnapshots.getDocuments().get(i).getId());
+                    }
+                    notificationList.setAdapter(new notification_list_adapter(notifications,notificationIds,context));
+                }else{
+                    Toast.makeText(context,"No Notifications Yet",Toast.LENGTH_LONG).show();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+              pd.dismiss();
+              Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

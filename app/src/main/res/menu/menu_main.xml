@@ -16,4 +16,8 @@
         android:id="@+id/fav_projects"
         android:title="Favourite Projects"
         />
+    <item
+        android:id="@+id/notifications"
+        android:title="Notifications"
+        />
 </menu>

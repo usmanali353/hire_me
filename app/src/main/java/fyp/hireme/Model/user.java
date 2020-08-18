@@ -1,7 +1,22 @@
 package fyp.hireme.Model;
 
 public class user {
-    String name,email,phone,password,role,offered_service;
+    String name;
+    String email;
+    String phone;
+    String password;
+    String role;
+    String offered_service;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        status = status;
+    }
+
+    String status;
  public user(){
 
  }
@@ -53,12 +68,13 @@ public class user {
         this.offered_service = offered_service;
     }
 
-    public user(String name, String email, String phone, String password, String role, String offered_service) {
+    public user(String name, String email, String phone, String password, String role, String offered_service,String status) {
         this.name = name;
         this.email = email;
         this.phone = phone;
         this.password = password;
         this.role = role;
         this.offered_service = offered_service;
+        this.status=status;
     }
 }
