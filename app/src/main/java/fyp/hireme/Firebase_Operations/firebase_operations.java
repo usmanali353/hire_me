@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.FragmentActivity;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -420,7 +421,7 @@ public class firebase_operations {
             }
         });
     }
-    public static void getAllUsers(Context context,RecyclerView usersList){
+    public static void getAllUsers(Context context, RecyclerView usersList, SearchView userSearch){
         ProgressDialog pd=new ProgressDialog(context);
         pd.setMessage("Fetching User List");
         pd.show();
@@ -435,7 +436,21 @@ public class firebase_operations {
                         users.add(queryDocumentSnapshots.getDocuments().get(i).toObject(user.class));
                         userId.add(queryDocumentSnapshots.getDocuments().get(i).getId());
                     }
-                    usersList.setAdapter(new user_list_adapter(users,userId,context));
+                    user_list_adapter ula=new user_list_adapter(users,userId,context);
+                    usersList.setAdapter(ula);
+                    userSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                        @Override
+                        public boolean onQueryTextSubmit(String query) {
+                            ula.getFilter().filter(query);
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onQueryTextChange(String newText) {
+                            ula.getFilter().filter(newText);
+                            return true;
+                        }
+                    });
                 }else{
                     Toast.makeText(context,"No Users Found",Toast.LENGTH_LONG).show();
                 }

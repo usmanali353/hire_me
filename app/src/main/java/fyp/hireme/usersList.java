@@ -10,7 +10,9 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.MenuItemCompat;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,6 +26,7 @@ import fyp.hireme.Firebase_Operations.firebase_operations;
 public class usersList extends AppCompatActivity {
 RecyclerView users;
 SharedPreferences prefs;
+SearchView userSearch;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,11 +36,13 @@ SharedPreferences prefs;
         prefs= PreferenceManager.getDefaultSharedPreferences(this);
         users=findViewById(R.id.usersList);
         users.setLayoutManager(new LinearLayoutManager(this));
-        firebase_operations.getAllUsers(this,users);
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.admin_menu,menu);
+        MenuItem searchitem=menu.findItem(R.id.action_search);
+        userSearch=(SearchView) MenuItemCompat.getActionView(searchitem);
+        firebase_operations.getAllUsers(this,users,userSearch);
         return true;
     }
 

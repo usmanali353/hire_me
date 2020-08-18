@@ -4,6 +4,8 @@ import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,19 +17,24 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 
+import fyp.hireme.Filters.user_filter;
 import fyp.hireme.Firebase_Operations.firebase_operations;
 import fyp.hireme.Model.user;
 import fyp.hireme.R;
 
-public class user_list_adapter extends RecyclerView.Adapter<user_list_adapter.user_list_viewholder> {
+public class user_list_adapter extends RecyclerView.Adapter<user_list_adapter.user_list_viewholder> implements Filterable {
     public user_list_adapter(ArrayList<user> users, ArrayList<String> usersId, Context context) {
         this.users = users;
         this.usersId = usersId;
         this.context = context;
+        this.filteredList=users;
+
     }
-    ArrayList<user> users;
+  public  ArrayList<user> users;
 ArrayList<String> usersId;
+    ArrayList<user> filteredList;
 Context context;
+user_filter filter;
     @NonNull
     @Override
     public user_list_viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -62,6 +69,14 @@ Context context;
     @Override
     public int getItemCount() {
         return users.size();
+    }
+
+    @Override
+    public Filter getFilter() {
+        if(filter==null){
+            filter=new user_filter(filteredList,this);
+        }
+        return filter;
     }
 
     class user_list_viewholder extends RecyclerView.ViewHolder{
