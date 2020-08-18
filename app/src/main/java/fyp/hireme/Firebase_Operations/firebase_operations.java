@@ -15,6 +15,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -34,19 +35,18 @@ import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import fr.ganfra.materialspinner.MaterialSpinner;
+import fyp.hireme.Adapters.approvalRequestsAdapter;
 import fyp.hireme.Adapters.bids_list_adapter;
 import fyp.hireme.Adapters.fav_projects_adapter;
 import fyp.hireme.Adapters.notification_list_adapter;
 import fyp.hireme.Adapters.projects_list_adapter;
 import fyp.hireme.Adapters.user_list_adapter;
+import fyp.hireme.Admin_Home;
 import fyp.hireme.MainActivity;
 import fyp.hireme.Model.Bid;
 import fyp.hireme.Model.Notifications;
@@ -57,7 +57,6 @@ import fyp.hireme.Model.user;
 import fyp.hireme.R;
 import fyp.hireme.Utils.utils;
 import fyp.hireme.dbhelper;
-import fyp.hireme.usersList;
 import fyp.hireme.worker_home;
 
 public class firebase_operations {
@@ -70,11 +69,11 @@ public class firebase_operations {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
-                    if(FirebaseAuth.getInstance().getCurrentUser().getUid().equals("csAMKO8zUraljjOc7uJpjGRUCfP2")){
+                    if(FirebaseAuth.getInstance().getCurrentUser().getUid().equals("kEwnH3FgGeesceOqgUazOnxYovX2")){
                         prefs.edit().putString("user_role","Admin").apply();
                         Toast.makeText(context,"Login Sucess",Toast.LENGTH_LONG).show();
                         loginDialog.dismiss();
-                        context.startActivity(new Intent(context, usersList.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                        context.startActivity(new Intent(context, Admin_Home.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK));
                         ((AppCompatActivity)context).finish();
                     }else{
                         FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -83,18 +82,23 @@ public class firebase_operations {
                                 pd.dismiss();
                                 if(documentSnapshot.exists()){
                                     user u=documentSnapshot.toObject(user.class);
-                                    prefs.edit().putString("user_info",new Gson().toJson(u)).apply();
-                                    Toast.makeText(context,"Login Sucess",Toast.LENGTH_LONG).show();
-                                    loginDialog.dismiss();
-                                    if(u.getRole().equals("Customer")){
-                                        context.startActivity(new Intent(context, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK));
-                                        ((AppCompatActivity)context).finish();
-                                    }else if(u.getRole().equals("Worker")){
-                                        context.startActivity(new Intent(context, worker_home.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK));
-                                        ((AppCompatActivity)context).finish();
+                                    if(u.getStatus().equals("Verified")){
+                                        prefs.edit().putString("user_info",new Gson().toJson(u)).apply();
+                                        Toast.makeText(context,"Login Sucess",Toast.LENGTH_LONG).show();
+                                        loginDialog.dismiss();
+                                        if(u.getRole().equals("Customer")){
+                                            context.startActivity(new Intent(context, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                                            ((AppCompatActivity)context).finish();
+                                        }else if(u.getRole().equals("Worker")){
+                                            context.startActivity(new Intent(context, worker_home.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                                            ((AppCompatActivity)context).finish();
+                                        }
+                                    }else{
+                                        Toast.makeText(context,"You are not permitted to use this Account that is because your approval Request is Pending or Rejected",Toast.LENGTH_LONG).show();
                                     }
+
                                 }else{
-                                    Toast.makeText(context,"No User Data Exist",Toast.LENGTH_LONG).show();
+                                    Toast.makeText(context,"Account was Blocked By Admin",Toast.LENGTH_LONG).show();
                                 }
                             }
                         }).addOnFailureListener(new OnFailureListener() {
@@ -441,13 +445,13 @@ public class firebase_operations {
             }
         });
     }
-    public static void getAllUsers(Context context, RecyclerView usersList, SearchView userSearch){
+    public static void getAllUsers(Context context, RecyclerView usersList, SearchView userSearch,Fragment fragment){
         ProgressDialog pd=new ProgressDialog(context);
         pd.setMessage("Fetching User List");
         pd.show();
         ArrayList<user> users=new ArrayList<>();
         ArrayList<String> userId=new ArrayList<>();
-        FirebaseFirestore.getInstance().collection("Users").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        FirebaseFirestore.getInstance().collection("Users").whereEqualTo("status","Verified").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 pd.dismiss();
@@ -456,7 +460,7 @@ public class firebase_operations {
                         users.add(queryDocumentSnapshots.getDocuments().get(i).toObject(user.class));
                         userId.add(queryDocumentSnapshots.getDocuments().get(i).getId());
                     }
-                    user_list_adapter ula=new user_list_adapter(users,userId,context);
+                    user_list_adapter ula=new user_list_adapter(users,userId,context,fragment);
                     usersList.setAdapter(ula);
                     userSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                         @Override
@@ -483,7 +487,7 @@ public class firebase_operations {
             }
         });
     }
-    public static void deleteUsers(Context context,String userId){
+    public static void deleteUsers(Context context,String userId,Fragment fragment){
         ProgressDialog pd=new ProgressDialog(context);
         pd.setMessage("Deleting User");
         pd.show();
@@ -493,8 +497,7 @@ public class firebase_operations {
                 pd.dismiss();
                 if(task.isSuccessful()){
                     Toast.makeText(context,"User Deleted Sucessfully",Toast.LENGTH_LONG).show();
-                    context.startActivity(new Intent(context,usersList.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP));
-                    ((AppCompatActivity)context).finish();
+                    ((AppCompatActivity)context).getSupportFragmentManager().beginTransaction().detach(fragment).attach(fragment).commit();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -714,6 +717,84 @@ public class firebase_operations {
             public void onFailure(@NonNull Exception e) {
               pd.dismiss();
               Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+    public static void getApprovalRequests(Context context,RecyclerView approvalRequests,SearchView requestSearch,Fragment fragment){
+        ProgressDialog pd=new ProgressDialog(context);
+        pd.setMessage("Fetching Approval Requests....");
+        pd.show();
+        ArrayList<Requests> requests=new ArrayList<>();
+        ArrayList<String> requestId=new ArrayList<>();
+        FirebaseFirestore.getInstance().collection("Requests").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                pd.dismiss();
+                if(queryDocumentSnapshots.getDocuments().size()>0){
+                    for(int i=0;i<queryDocumentSnapshots.getDocuments().size();i++){
+                        requests.add(queryDocumentSnapshots.getDocuments().get(i).toObject(Requests.class));
+                        requestId.add(queryDocumentSnapshots.getDocuments().get(i).getId());
+                    }
+                    approvalRequestsAdapter ara=new approvalRequestsAdapter(requests,requestId,context,fragment);
+                    approvalRequests.setAdapter(ara);
+                    requestSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                        @Override
+                        public boolean onQueryTextSubmit(String query) {
+                            ara.getFilter().filter(query);
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onQueryTextChange(String newText) {
+                            ara.getFilter().filter(newText);
+                            return true;
+                        }
+                    });
+                }else{
+                    Toast.makeText(context,"No Approval Requests Yet",Toast.LENGTH_LONG).show();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                pd.dismiss();
+                Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+    public static void changeRequestStatus(Context context, String requestId, String status, String userId, Fragment fragment){
+        ProgressDialog pd=new ProgressDialog(context);
+        pd.setMessage("Changing Status....");
+        pd.show();
+        Map<String,Object> requestStatusUpdate =new HashMap<>();
+        requestStatusUpdate.put("status",status);
+        FirebaseFirestore.getInstance().collection("Requests").document(requestId).update(requestStatusUpdate).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                pd.dismiss();
+                if(task.isSuccessful()){
+                    FirebaseFirestore.getInstance().collection("Users").document(userId).update(requestStatusUpdate).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if(task.isSuccessful()){
+                                Toast.makeText(context,"Request status changed",Toast.LENGTH_LONG).show();
+                                ((AppCompatActivity)context).getSupportFragmentManager().beginTransaction().detach(fragment).attach(fragment).commit();
+                            }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            pd.dismiss();
+                            Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                pd.dismiss();
+                Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
             }
         });
     }

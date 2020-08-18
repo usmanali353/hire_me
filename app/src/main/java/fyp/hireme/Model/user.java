@@ -13,7 +13,7 @@ public class user {
     }
 
     public void setStatus(String status) {
-        status = status;
+        this.status = status;
     }
 
     String status;

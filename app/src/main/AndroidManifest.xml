@@ -20,16 +20,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".Admin_Home"
+            android:label="@string/title_activity_admin__home"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
             android:name=".Notifications"
             android:label="@string/title_activity_notifications"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".fav_projects"
             android:label="@string/title_activity_fav_projects"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".usersList"
-            android:label="@string/title_activity_users_list"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".bidsList"

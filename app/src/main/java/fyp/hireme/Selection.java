@@ -55,7 +55,7 @@ public class Selection extends AppCompatActivity {
                 }
             }
         }  else if(prefs.getString("user_role",null)!=null){
-            startActivity(new Intent(Selection.this,usersList.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            startActivity(new Intent(Selection.this,Admin_Home.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP));
             finish();
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
